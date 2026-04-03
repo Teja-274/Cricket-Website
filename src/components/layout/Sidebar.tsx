@@ -28,9 +28,10 @@ const navItems = [
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
+  onNavigate: () => void
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
   const location = useLocation()
 
   return (
@@ -42,24 +43,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     >
       {/* Logo */}
       <div className="h-16 flex items-center px-4 border-b border-border/50">
-        <motion.div
-          whileHover={{ rotate: [0, -10, 10, 0] }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div whileHover={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.5 }}>
           <Trophy className="w-8 h-8 text-primary shrink-0" />
         </motion.div>
         <AnimatePresence>
           {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.2 }}
-              className="ml-3 overflow-hidden"
-            >
-              <h1 className="text-lg font-bold text-primary tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>
-                SCOUT INDIA
-              </h1>
+            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }} className="ml-3 overflow-hidden">
+              <h1 className="text-lg font-bold text-primary tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>SCOUT INDIA</h1>
               <p className="text-[10px] text-muted-foreground -mt-1">IPL Auction Strategy</p>
             </motion.div>
           )}
@@ -67,52 +58,32 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 px-2 space-y-1">
+      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.to ||
-            (item.to !== '/' && location.pathname.startsWith(item.to))
-
+          const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
           return (
-            <NavLink
-              key={item.to}
-              to={item.to}
+            <NavLink key={item.to} to={item.to} onClick={onNavigate}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden',
-                isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
-              )}
-            >
+                isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+              )}>
               {isActive && (
-                <motion.div
-                  layoutId="sidebar-active"
-                  className="absolute inset-0 bg-primary/10 rounded-xl"
-                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                />
+                <motion.div layoutId="sidebar-active" className="absolute inset-0 bg-primary/10 rounded-xl"
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }} />
               )}
               {isActive && (
-                <motion.div
-                  layoutId="sidebar-indicator"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full"
-                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                />
+                <motion.div layoutId="sidebar-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full"
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }} />
               )}
               <item.icon className={cn('w-5 h-5 shrink-0 relative z-10', isActive && 'text-primary')} />
               <AnimatePresence>
                 {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -8 }}
-                    transition={{ duration: 0.15 }}
-                    className="text-sm font-medium whitespace-nowrap relative z-10"
-                  >
+                  <motion.span initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
+                    transition={{ duration: 0.15 }} className="text-sm font-medium whitespace-nowrap relative z-10">
                     {item.label}
                   </motion.span>
                 )}
               </AnimatePresence>
-
-              {/* Tooltip for collapsed state */}
               {collapsed && (
                 <div className="absolute left-full ml-2 px-2 py-1 bg-card border border-border rounded-md text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-[60]">
                   {item.label}
@@ -129,12 +100,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <ThemeToggle />
           <SoundToggle />
         </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onToggle}
-          className="w-full p-2.5 rounded-xl bg-accent/50 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
-        >
+        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={onToggle}
+          className="w-full p-2.5 rounded-xl bg-accent/50 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center">
           <motion.div animate={{ rotate: collapsed ? 0 : 180 }} transition={{ duration: 0.3 }}>
             <ChevronRight className="w-4 h-4" />
           </motion.div>

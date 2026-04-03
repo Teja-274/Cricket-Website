@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Toaster } from '@/components/ui/sonner'
 import { Layout } from '@/components/layout/Layout'
 import { LandingPage } from '@/pages/LandingPage'
 import { LobbyPage } from '@/pages/LobbyPage'
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/strategy" element={<StrategyPage />} />
         </Route>
       </Routes>
+      <Toaster richColors position="bottom-right" theme="dark" />
     </BrowserRouter>
   )
 }

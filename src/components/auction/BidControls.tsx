@@ -2,6 +2,8 @@ import { motion } from 'framer-motion'
 import { Gavel, RotateCcw, CheckCircle2, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AnimatedCounter } from '@/components/ui/animated-counter'
+import { PulsatingButton } from '@/components/magicui/pulsating-button'
+import confetti from 'canvas-confetti'
 import { useAuctionStore } from '@/store/auctionStore'
 
 function getBidIncrement(currentBid: number): number {
@@ -12,12 +14,39 @@ function getBidIncrement(currentBid: number): number {
   return 1.0
 }
 
+function fireConfetti(color: string) {
+  const colors = [color, '#f59e0b', '#22c55e']
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors,
+  })
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.6 },
+      colors,
+    })
+    confetti({
+      particleCount: 50,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.6 },
+      colors,
+    })
+  }, 200)
+}
+
 export function BidControls({ isAdmin }: { isAdmin: boolean }) {
   const {
     currentBid,
     currentBidderId,
     myFranchiseId,
     franchises,
+    timerSeconds,
     placeBid,
     placeRtmBid,
     markSold,
@@ -36,6 +65,13 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
     : Math.round((currentBid + getBidIncrement(currentBid)) * 100) / 100
   const canBid = nextBid <= myFranchise.purseRemaining && currentBidderId !== myFranchiseId
   const canRtm = myFranchise.rtmCards > 0 && currentBid > 0 && currentBidderId !== myFranchiseId
+  const isUrgent = timerSeconds <= 5 && timerSeconds > 0
+
+  const handleSold = () => {
+    const bidderColor = currentBidder?.color || '#f59e0b'
+    fireConfetti(bidderColor)
+    markSold()
+  }
 
   return (
     <div className="space-y-6">
@@ -69,17 +105,29 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
 
       {/* Bid Buttons */}
       <div className="flex flex-col gap-3">
-        <motion.div whileHover={{ scale: canBid ? 1.02 : 1 }} whileTap={{ scale: canBid ? 0.98 : 1 }}>
-          <Button
+        {isUrgent && canBid ? (
+          <PulsatingButton
             onClick={() => placeBid(myFranchiseId!)}
-            disabled={!canBid}
-            className="w-full py-8 text-xl font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 shadow-lg shadow-primary/20"
+            pulseColor="#f59e0b"
+            className="w-full py-8 text-xl font-bold rounded-xl bg-primary text-primary-foreground"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             <Gavel className="w-6 h-6 mr-3" />
-            BID {nextBid} Cr
-          </Button>
-        </motion.div>
+            BID {nextBid} Cr - HURRY!
+          </PulsatingButton>
+        ) : (
+          <motion.div whileHover={{ scale: canBid ? 1.02 : 1 }} whileTap={{ scale: canBid ? 0.98 : 1 }}>
+            <Button
+              onClick={() => placeBid(myFranchiseId!)}
+              disabled={!canBid}
+              className="w-full py-8 text-xl font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 shadow-lg shadow-primary/20"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              <Gavel className="w-6 h-6 mr-3" />
+              BID {nextBid} Cr
+            </Button>
+          </motion.div>
+        )}
 
         {canRtm && (
           <motion.div
@@ -99,12 +147,12 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
           </motion.div>
         )}
 
-        {/* Admin controls */}
+        {/* Admin controls with confetti on SOLD */}
         {isAdmin && currentBid > 0 && (
           <div className="flex gap-3 pt-2 border-t border-border">
             <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
-                onClick={markSold}
+                onClick={handleSold}
                 className="w-full py-5 bg-chart-2 hover:bg-chart-2/90 text-white font-bold rounded-xl"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >

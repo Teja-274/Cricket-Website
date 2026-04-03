@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { LivePulse } from '@/components/ui/live-pulse'
+import { BorderBeam } from '@/components/magicui/border-beam'
 import type { Player } from '@/data/players'
 
 const roleColors: Record<string, string> = {
@@ -30,6 +31,8 @@ export function PlayerBlock({ player, isActive }: { player: Player; isActive: bo
         transition={{ duration: 0.4 }}
         className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden"
       >
+        {/* Animated border beam when active */}
+        {isActive && <BorderBeam size={250} duration={6} colorFrom="#f59e0b" colorTo="#22c55e" />}
         {/* Glow effect */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/0 via-primary/60 to-primary/0" />
 

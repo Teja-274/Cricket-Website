@@ -8,12 +8,14 @@ import {
   Star,
   Trophy,
   ChevronRight,
+  Shield,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
   { to: '/', icon: Home, label: 'Home' },
   { to: '/lobby', icon: Gavel, label: 'Auction Lobby' },
+  { to: '/teams', icon: Shield, label: 'Team Squads' },
   { to: '/scout', icon: Search, label: 'Scout Players' },
   { to: '/compare', icon: GitCompareArrows, label: 'Compare' },
   { to: '/shortlist', icon: Star, label: 'Shortlist' },

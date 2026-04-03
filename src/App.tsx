@@ -6,6 +6,7 @@ import { AuctionRoomPage } from '@/pages/AuctionRoomPage'
 import { ScoutPage } from '@/pages/ScoutPage'
 import { ComparePage } from '@/pages/ComparePage'
 import { ShortlistPage } from '@/pages/ShortlistPage'
+import { TeamsPage } from '@/pages/TeamsPage'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/lobby" element={<LobbyPage />} />
           <Route path="/room/:id" element={<AuctionRoomPage />} />
+          <Route path="/teams" element={<TeamsPage />} />
           <Route path="/scout" element={<ScoutPage />} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/shortlist" element={<ShortlistPage />} />

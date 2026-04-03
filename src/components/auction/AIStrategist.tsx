@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { Player } from '@/data/players'
 import type { Franchise } from '@/data/franchises'
+import { askGrok, STRATEGIST_SYSTEM_PROMPT, isGrokConfigured } from '@/lib/grok'
 
 interface AIAdvice {
   fairValue: number
@@ -58,11 +59,33 @@ export function AIStrategist({ player, franchise }: { player: Player | null; fra
     if (!player || !franchise) return
     setIsLoading(true)
     setAdvice(null)
-    const timeout = setTimeout(() => {
-      setAdvice(generateMockAdvice(player, franchise))
-      setIsLoading(false)
-    }, 800)
-    return () => clearTimeout(timeout)
+    let cancelled = false
+
+    const fetchAdvice = async () => {
+      if (isGrokConfigured()) {
+        try {
+          const prompt = `Player up for auction: ${player.name}\nRole: ${player.role} | State: ${player.state} | IPL Team: ${player.iplTeam}\nBase Price: ${player.basePriceCr} Cr\nStats: ${JSON.stringify(player.stats)}\n\nMy franchise: ${franchise.name}\nPurse remaining: ${franchise.purseRemaining} Cr\nRTM cards left: ${franchise.rtmCards}\nPlayers bought: ${franchise.playersBought}\n\nProvide your analysis in this exact JSON format:\n{"fairValue": number, "bidCeiling": number, "recommendation": "BID AGGRESSIVELY" | "BID CAUTIOUSLY" | "SKIP", "rtmAdvice": "string", "reasoning": "string"}`
+          const response = await askGrok(prompt, STRATEGIST_SYSTEM_PROMPT)
+          if (cancelled) return
+          try {
+            const jsonMatch = response.match(/\{[\s\S]*\}/)
+            if (jsonMatch) {
+              const parsed = JSON.parse(jsonMatch[0])
+              setAdvice(parsed)
+              setIsLoading(false)
+              return
+            }
+          } catch { /* fall through to mock */ }
+        } catch { /* fall through to mock */ }
+      }
+      if (!cancelled) {
+        setAdvice(generateMockAdvice(player, franchise))
+        setIsLoading(false)
+      }
+    }
+
+    fetchAdvice()
+    return () => { cancelled = true }
   }, [player?.id, franchise?.id])
 
   const handleChat = () => {
@@ -71,12 +94,21 @@ export function AIStrategist({ player, franchise }: { player: Player | null; fra
     setChatInput('')
     setChatMessages(prev => [...prev, { role: 'user', text: question }])
 
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, {
-        role: 'ai',
-        text: `Based on ${player?.name}'s profile, ${question.toLowerCase().includes('worth') ? `fair value is around ${advice?.fairValue} Cr.` : question.toLowerCase().includes('rtm') ? 'I recommend saving RTM cards for proven match-winners.' : 'this is a solid pick if the price stays reasonable. Monitor other franchises\' interest levels.'}`
-      }])
-    }, 500)
+    if (isGrokConfigured()) {
+      askGrok(
+        `About ${player?.name} (${player?.role}, ${player?.iplTeam}): ${question}`,
+        STRATEGIST_SYSTEM_PROMPT
+      ).then(response => {
+        setChatMessages(prev => [...prev, { role: 'ai', text: response }])
+      })
+    } else {
+      setTimeout(() => {
+        setChatMessages(prev => [...prev, {
+          role: 'ai',
+          text: `Based on ${player?.name}'s profile, ${question.toLowerCase().includes('worth') ? `fair value is around ${advice?.fairValue} Cr.` : question.toLowerCase().includes('rtm') ? 'I recommend saving RTM cards for proven match-winners.' : 'this is a solid pick if the price stays reasonable. Monitor other franchises\' interest levels.'}`
+        }])
+      }, 500)
+    }
   }
 
   const recColor = {

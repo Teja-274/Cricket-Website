@@ -9,8 +9,11 @@ import {
   Trophy,
   ChevronRight,
   Shield,
+  Target,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { SoundToggle } from '@/components/ui/sound-toggle'
 
 const navItems = [
   { to: '/', icon: Home, label: 'Home' },
@@ -19,6 +22,7 @@ const navItems = [
   { to: '/scout', icon: Search, label: 'Scout Players' },
   { to: '/compare', icon: GitCompareArrows, label: 'Compare' },
   { to: '/shortlist', icon: Star, label: 'Shortlist' },
+  { to: '/strategy', icon: Target, label: 'Strategy' },
 ]
 
 interface SidebarProps {
@@ -119,17 +123,23 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      {/* Collapse toggle */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={onToggle}
-        className="mx-2 mb-4 p-2.5 rounded-xl bg-accent/50 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
-      >
-        <motion.div animate={{ rotate: collapsed ? 0 : 180 }} transition={{ duration: 0.3 }}>
-          <ChevronRight className="w-4 h-4" />
-        </motion.div>
-      </motion.button>
+      {/* Bottom controls */}
+      <div className="px-2 pb-4 space-y-2">
+        <div className={`flex ${collapsed ? 'flex-col' : 'flex-row'} gap-2 items-center`}>
+          <ThemeToggle />
+          <SoundToggle />
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onToggle}
+          className="w-full p-2.5 rounded-xl bg-accent/50 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+        >
+          <motion.div animate={{ rotate: collapsed ? 0 : 180 }} transition={{ duration: 0.3 }}>
+            <ChevronRight className="w-4 h-4" />
+          </motion.div>
+        </motion.button>
+      </div>
     </motion.aside>
   )
 }

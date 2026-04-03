@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { PulsatingButton } from '@/components/magicui/pulsating-button'
 import confetti from 'canvas-confetti'
+import { playSound } from '@/lib/sounds'
 import { useAuctionStore } from '@/store/auctionStore'
 
 function getBidIncrement(currentBid: number): number {
@@ -67,10 +68,27 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
   const canRtm = myFranchise.rtmCards > 0 && currentBid > 0 && currentBidderId !== myFranchiseId
   const isUrgent = timerSeconds <= 5 && timerSeconds > 0
 
+  const handleBid = () => {
+    placeBid(myFranchiseId!)
+    playSound('bid')
+  }
+
+  const handleRtm = () => {
+    placeRtmBid(myFranchiseId!)
+    playSound('bid')
+  }
+
   const handleSold = () => {
     const bidderColor = currentBidder?.color || '#f59e0b'
     fireConfetti(bidderColor)
+    playSound('sold')
+    playSound('crowd')
     markSold()
+  }
+
+  const handleUnsold = () => {
+    playSound('unsold')
+    markUnsold()
   }
 
   return (
@@ -107,7 +125,7 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
       <div className="flex flex-col gap-3">
         {isUrgent && canBid ? (
           <PulsatingButton
-            onClick={() => placeBid(myFranchiseId!)}
+            onClick={handleBid}
             pulseColor="#f59e0b"
             className="w-full py-8 text-xl font-bold rounded-xl bg-primary text-primary-foreground"
             style={{ fontFamily: 'var(--font-heading)' }}
@@ -118,7 +136,7 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
         ) : (
           <motion.div whileHover={{ scale: canBid ? 1.02 : 1 }} whileTap={{ scale: canBid ? 0.98 : 1 }}>
             <Button
-              onClick={() => placeBid(myFranchiseId!)}
+              onClick={handleBid}
               disabled={!canBid}
               className="w-full py-8 text-xl font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 shadow-lg shadow-primary/20"
               style={{ fontFamily: 'var(--font-heading)' }}
@@ -137,7 +155,7 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
             whileTap={{ scale: 0.98 }}
           >
             <Button
-              onClick={() => placeRtmBid(myFranchiseId!)}
+              onClick={handleRtm}
               className="w-full py-6 text-lg font-bold rounded-xl bg-chart-3 text-white hover:bg-chart-3/90"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
@@ -162,7 +180,7 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
             </motion.div>
             <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
-                onClick={markUnsold}
+                onClick={handleUnsold}
                 variant="outline"
                 className="w-full py-5 border-destructive text-destructive hover:bg-destructive/10 font-bold rounded-xl"
                 style={{ fontFamily: 'var(--font-heading)' }}

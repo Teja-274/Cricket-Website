@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { Star, GitCompareArrows, User } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -34,6 +35,7 @@ const tierColors: Record<string, string> = {
 }
 
 export function PlayerCard({ player, index }: { player: Player; index: number }) {
+  const navigate = useNavigate()
   const { addToShortlist, isInShortlist, setCompareSlot, compareSlots } = useAppStore()
   const inShortlist = isInShortlist(player.id)
   const primaryStat = player.stats.ipl || player.stats.t20i || player.stats.ranji
@@ -56,7 +58,8 @@ export function PlayerCard({ player, index }: { player: Player; index: number })
             <User className="w-5 h-5 text-muted-foreground" />
           </div>
           <div>
-            <h3 className="font-bold text-sm leading-tight">{player.name}</h3>
+            <h3 className="font-bold text-sm leading-tight cursor-pointer hover:text-primary transition-colors"
+              onClick={() => navigate(`/player/${player.id}`)}>{player.name}</h3>
             <div className="flex items-center gap-1.5 mt-0.5">
               <Badge className={`text-[9px] py-0 ${roleColors[player.role]}`}>{player.role}</Badge>
               {player.isCapped && <Badge variant="outline" className="text-[9px] py-0 border-amber-500/30 text-amber-400">INT</Badge>}

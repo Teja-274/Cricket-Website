@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home,
   Gavel,
@@ -7,10 +7,8 @@ import {
   GitCompareArrows,
   Star,
   Trophy,
-  ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -21,32 +19,45 @@ const navItems = [
   { to: '/shortlist', icon: Star, label: 'Shortlist' },
 ]
 
-export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+interface SidebarProps {
+  collapsed: boolean
+  onToggle: () => void
+}
+
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation()
 
   return (
     <motion.aside
       initial={false}
       animate={{ width: collapsed ? 72 : 240 }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
-      className="fixed left-0 top-0 h-screen bg-card border-r border-border z-50 flex flex-col"
+      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      className="fixed left-0 top-0 h-screen bg-card/80 backdrop-blur-xl border-r border-border/50 z-50 flex flex-col"
     >
       {/* Logo */}
-      <div className="h-16 flex items-center px-4 border-b border-border">
-        <Trophy className="w-8 h-8 text-primary shrink-0" />
-        {!collapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="ml-3 overflow-hidden"
-          >
-            <h1 className="text-lg font-bold text-primary tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>
-              SCOUT INDIA
-            </h1>
-            <p className="text-[10px] text-muted-foreground -mt-1">IPL Auction Strategy</p>
-          </motion.div>
-        )}
+      <div className="h-16 flex items-center px-4 border-b border-border/50">
+        <motion.div
+          whileHover={{ rotate: [0, -10, 10, 0] }}
+          transition={{ duration: 0.5 }}
+        >
+          <Trophy className="w-8 h-8 text-primary shrink-0" />
+        </motion.div>
+        <AnimatePresence>
+          {!collapsed && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
+              className="ml-3 overflow-hidden"
+            >
+              <h1 className="text-lg font-bold text-primary tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>
+                SCOUT INDIA
+              </h1>
+              <p className="text-[10px] text-muted-foreground -mt-1">IPL Auction Strategy</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Nav */}
@@ -60,28 +71,46 @@ export function Sidebar() {
               key={item.to}
               to={item.to}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden',
                 isActive
                   ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
               )}
             >
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full"
-                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  className="absolute inset-0 bg-primary/10 rounded-xl"
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                 />
               )}
-              <item.icon className={cn('w-5 h-5 shrink-0', isActive && 'text-primary')} />
-              {!collapsed && (
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-sm font-medium whitespace-nowrap"
-                >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-indicator"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full"
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                />
+              )}
+              <item.icon className={cn('w-5 h-5 shrink-0 relative z-10', isActive && 'text-primary')} />
+              <AnimatePresence>
+                {!collapsed && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="text-sm font-medium whitespace-nowrap relative z-10"
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+
+              {/* Tooltip for collapsed state */}
+              {collapsed && (
+                <div className="absolute left-full ml-2 px-2 py-1 bg-card border border-border rounded-md text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-[60]">
                   {item.label}
-                </motion.span>
+                </div>
               )}
             </NavLink>
           )
@@ -89,12 +118,16 @@ export function Sidebar() {
       </nav>
 
       {/* Collapse toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="mx-2 mb-4 p-2 rounded-lg bg-accent hover:bg-accent/80 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onToggle}
+        className="mx-2 mb-4 p-2.5 rounded-xl bg-accent/50 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
       >
-        {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-      </button>
+        <motion.div animate={{ rotate: collapsed ? 0 : 180 }} transition={{ duration: 0.3 }}>
+          <ChevronRight className="w-4 h-4" />
+        </motion.div>
+      </motion.button>
     </motion.aside>
   )
 }

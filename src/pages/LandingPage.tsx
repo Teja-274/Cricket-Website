@@ -10,6 +10,7 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button'
 import { Marquee } from '@/components/magicui/marquee'
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { TextAnimate } from '@/components/magicui/text-animate'
+import CrystalCursor from '@/components/ui/crystal-cursor'
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -53,20 +54,19 @@ export function LandingPage() {
   const navigate = useNavigate()
 
   return (
+    <CrystalCursor
+      backgroundOnly
+      className="min-h-screen"
+    >
     <div className="min-h-screen overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center px-8">
-        {/* Animated background */}
-        <div className="absolute inset-0 overflow-hidden">
+        {/* Animated background circles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-chart-3/5 rounded-full blur-3xl" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-border/20 rounded-full" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-border/10 rounded-full" />
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-primary/5 rounded-full"
-          />
         </div>
 
         <motion.div
@@ -366,5 +366,6 @@ export function LandingPage() {
         </motion.div>
       </section>
     </div>
+    </CrystalCursor>
   )
 }

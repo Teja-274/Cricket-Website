@@ -165,7 +165,7 @@ class Crystal {
   }
 
   draw() {
-    this.context.strokeStyle = `hsla(220, 100%, 80%, ${this.life / 150})`;
+    this.context.strokeStyle = `hsla(0, 85%, 60%, ${this.life / 150})`;
     this.context.lineWidth = this.lineWidth;
     this.context.beginPath();
     this.context.moveTo(this.x, this.y);
@@ -207,7 +207,7 @@ class Shard {
   }
 
   draw() {
-    this.context.fillStyle = `hsla(220, 100%, 90%, ${this.life / 100})`;
+    this.context.fillStyle = `hsla(0, 90%, 70%, ${this.life / 100})`;
     this.context.beginPath();
     this.context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     this.context.fill();

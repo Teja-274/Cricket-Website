@@ -21,7 +21,7 @@ export function Layout() {
   }, [location.pathname])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{ backgroundImage: 'radial-gradient(ellipse 100% 25% at 50% 0%, rgba(245,166,35,0.03), transparent 70%)' }}>
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-card/80 backdrop-blur-xl border-b border-border/50 z-40 flex items-center px-4 gap-3">
         <button

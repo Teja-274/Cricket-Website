@@ -39,7 +39,8 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
       initial={false}
       animate={{ width: collapsed ? 72 : 240 }}
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      className="fixed left-0 top-0 h-screen bg-card/80 backdrop-blur-xl border-r border-border/50 z-50 flex flex-col"
+      className="fixed left-0 top-0 h-screen bg-[#080f14]/95 backdrop-blur-xl border-r border-green-900/30 z-50 flex flex-col"
+      style={{ backgroundImage: 'linear-gradient(to bottom, rgba(245,166,35,0.02) 0%, transparent 15%, rgba(10,40,20,0.05) 100%)' }}
     >
       {/* Logo */}
       <div className="h-16 flex items-center px-4 border-b border-border/50">

@@ -30,11 +30,14 @@ export function PlayerBlock({ player, isActive }: { player: Player; isActive: bo
         exit={{ opacity: 0, scale: 0.95, y: -10 }}
         transition={{ duration: 0.4 }}
         className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden"
+        style={{ backgroundImage: 'linear-gradient(to bottom, rgba(10,40,20,0.08), transparent 40%)' }}
       >
         {/* Animated border beam when active */}
-        {isActive && <BorderBeam size={250} duration={6} colorFrom="#f59e0b" colorTo="#22c55e" />}
-        {/* Glow effect */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/0 via-primary/60 to-primary/0" />
+        {isActive && <BorderBeam size={250} duration={6} colorFrom="#f5a623" colorTo="#22c55e" />}
+        {/* Floodlight top glow */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
+        {/* Pitch green bottom accent */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-600/30 to-transparent" />
 
         {/* Header */}
         <div className="flex items-start justify-between mb-4">

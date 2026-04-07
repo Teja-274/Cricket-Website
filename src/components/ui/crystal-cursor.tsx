@@ -41,7 +41,7 @@ const CrystalCursor: React.FC<CrystalCursorProps> = ({
     canvas.height = window.innerHeight;
 
     const animate = () => {
-      ctx.fillStyle = "rgba(10, 18, 40, 0.1)";
+      ctx.fillStyle = "rgba(6, 12, 16, 0.1)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (Math.random() > 0.7) {
@@ -111,7 +111,7 @@ const CrystalCursor: React.FC<CrystalCursorProps> = ({
   }
 
   return (
-    <div className={`relative h-screen w-screen overflow-hidden bg-[#0a1228] font-sans ${className}`}>
+    <div className={`relative h-screen w-screen overflow-hidden bg-[#060c10] font-sans ${className}`}>
       <canvas ref={canvasRef} className="fixed inset-0 block h-full w-full" />
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-2 select-none text-center p-4">
         <h1

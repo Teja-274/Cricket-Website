@@ -37,7 +37,8 @@ export function AuctionRoomPage() {
   if (!room) return null
 
   return (
-    <div className="min-h-screen p-4 lg:p-6">
+    <div className="min-h-screen p-4 lg:p-6 relative"
+      style={{ backgroundImage: 'radial-gradient(ellipse 80% 30% at 50% 0%, rgba(245,166,35,0.04), transparent 60%), linear-gradient(to top, rgba(10,50,25,0.1), transparent 30%)' }}>
       {/* Top Bar */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">

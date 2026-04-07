@@ -76,76 +76,62 @@ export function CricketBallCursor() {
           style={{ rotate: rotationValue, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))' }}
         >
           <defs>
-            {/* 3D ball gradient */}
+            {/* Darker 3D ball gradient */}
             <radialGradient id="ballGrad" cx="35%" cy="30%" r="65%">
-              <stop offset="0%" stopColor="#ff6b6b" />
-              <stop offset="25%" stopColor="#ee3333" />
-              <stop offset="55%" stopColor="#cc2222" />
-              <stop offset="85%" stopColor="#991111" />
-              <stop offset="100%" stopColor="#661010" />
+              <stop offset="0%" stopColor="#d44" />
+              <stop offset="20%" stopColor="#b22" />
+              <stop offset="50%" stopColor="#911" />
+              <stop offset="80%" stopColor="#700e0e" />
+              <stop offset="100%" stopColor="#4a0808" />
             </radialGradient>
             {/* Shine highlight */}
             <radialGradient id="shine" cx="30%" cy="25%" r="25%">
-              <stop offset="0%" stopColor="white" stopOpacity="0.6" />
+              <stop offset="0%" stopColor="white" stopOpacity="0.5" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
             </radialGradient>
             {/* Secondary shine */}
             <radialGradient id="shine2" cx="65%" cy="70%" r="20%">
-              <stop offset="0%" stopColor="white" stopOpacity="0.15" />
+              <stop offset="0%" stopColor="white" stopOpacity="0.1" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
             </radialGradient>
           </defs>
 
-          {/* Ball body */}
-          <circle cx="50" cy="50" r="46" fill="url(#ballGrad)" stroke="#881111" strokeWidth="1" />
+          {/* Ball body - darker red */}
+          <circle cx="50" cy="50" r="46" fill="url(#ballGrad)" stroke="#600a0a" strokeWidth="1" />
 
           {/* Shine overlay */}
           <circle cx="50" cy="50" r="46" fill="url(#shine)" />
           <circle cx="50" cy="50" r="46" fill="url(#shine2)" />
 
-          {/* Left seam curve */}
-          <path
-            d="M 30 12 C 36 22, 38 40, 36 50 C 34 60, 36 78, 30 88"
-            stroke="#f8e8d0"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-          />
-          {/* Right seam curve */}
-          <path
-            d="M 70 12 C 64 22, 62 40, 64 50 C 66 60, 64 78, 70 88"
-            stroke="#f8e8d0"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-          />
+          {/* Left seam - straight line, dotted like thread */}
+          <line x1="33" y1="10" x2="33" y2="90" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="3 3" />
+          {/* Right seam - straight line, dotted like thread */}
+          <line x1="67" y1="10" x2="67" y2="90" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="3 3" />
 
-          {/* Left stitch marks */}
-          <line x1="31" y1="18" x2="26" y2="14" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="34" y1="25" x2="28" y2="22" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="36" y1="32" x2="30" y2="30" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="37" y1="39" x2="31" y2="38" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="36" y1="46" x2="30" y2="46" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="35" y1="53" x2="29" y2="54" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="36" y1="60" x2="30" y2="62" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="37" y1="67" x2="31" y2="70" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="35" y1="74" x2="29" y2="77" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="33" y1="81" x2="27" y2="84" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Left stitch marks - straight horizontal dashes */}
+          <line x1="33" y1="16" x2="27" y2="14" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="24" x2="27" y2="22" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="32" x2="27" y2="30" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="40" x2="27" y2="38" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="48" x2="27" y2="47" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="56" x2="27" y2="56" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="64" x2="27" y2="64" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="72" x2="27" y2="72" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="80" x2="27" y2="80" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
 
-          {/* Right stitch marks */}
-          <line x1="69" y1="18" x2="74" y2="14" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="66" y1="25" x2="72" y2="22" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="64" y1="32" x2="70" y2="30" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="63" y1="39" x2="69" y2="38" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="64" y1="46" x2="70" y2="46" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="65" y1="53" x2="71" y2="54" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="64" y1="60" x2="70" y2="62" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="63" y1="67" x2="69" y2="70" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="65" y1="74" x2="71" y2="77" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="67" y1="81" x2="73" y2="84" stroke="#f8e8d0" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Right stitch marks - straight horizontal dashes */}
+          <line x1="67" y1="16" x2="73" y2="14" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="24" x2="73" y2="22" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="32" x2="73" y2="30" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="40" x2="73" y2="38" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="48" x2="73" y2="47" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="56" x2="73" y2="56" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="64" x2="73" y2="64" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="72" x2="73" y2="72" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="80" x2="73" y2="80" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
 
-          {/* Subtle inner shadow for depth */}
-          <circle cx="50" cy="50" r="44" fill="none" stroke="#550000" strokeWidth="2" opacity="0.15" />
+          {/* Inner shadow for depth */}
+          <circle cx="50" cy="50" r="44" fill="none" stroke="#300505" strokeWidth="2" opacity="0.2" />
         </motion.svg>
       </motion.div>
     </motion.div>

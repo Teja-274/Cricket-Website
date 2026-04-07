@@ -12,6 +12,7 @@ import { PlayerProfilePage } from '@/pages/PlayerProfilePage'
 import { AuctionResultsPage } from '@/pages/AuctionResultsPage'
 import { StrategyPage } from '@/pages/StrategyPage'
 import { LoginPage } from '@/pages/LoginPage'
+import { CricketBallCursor } from '@/components/ui/cricket-ball-cursor'
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/strategy" element={<StrategyPage />} />
         </Route>
       </Routes>
+      <CricketBallCursor />
       <Toaster richColors position="bottom-right" theme="dark" />
     </BrowserRouter>
   )

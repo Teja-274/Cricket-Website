@@ -91,27 +91,14 @@ export function PlayerBlock({ player, isActive }: { player: Player; isActive: bo
               </div>
             </div>
           )}
-          {stats.t20i && (
+          {stats.phases && (
             <div className="p-3 rounded-lg bg-background border border-border">
-              <div className="text-[10px] font-semibold text-chart-3 uppercase tracking-wider mb-1.5">T20I Stats</div>
-              <div className="grid grid-cols-4 gap-2 text-xs">
-                <div><span className="text-muted-foreground">Mat: </span><span className="font-semibold">{stats.t20i.matches}</span></div>
-                {stats.t20i.runs != null && <div><span className="text-muted-foreground">Runs: </span><span className="font-semibold">{stats.t20i.runs}</span></div>}
-                {stats.t20i.avg != null && <div><span className="text-muted-foreground">Avg: </span><span className="font-semibold">{stats.t20i.avg}</span></div>}
-                {stats.t20i.sr != null && <div><span className="text-muted-foreground">SR: </span><span className="font-semibold">{stats.t20i.sr}</span></div>}
-                {stats.t20i.wickets != null && <div><span className="text-muted-foreground">Wkts: </span><span className="font-semibold">{stats.t20i.wickets}</span></div>}
-                {stats.t20i.economy != null && <div><span className="text-muted-foreground">Econ: </span><span className="font-semibold">{stats.t20i.economy}</span></div>}
-              </div>
-            </div>
-          )}
-          {stats.ranji && !stats.ipl && (
-            <div className="p-3 rounded-lg bg-background border border-border">
-              <div className="text-[10px] font-semibold text-chart-2 uppercase tracking-wider mb-1.5">Ranji Stats</div>
-              <div className="grid grid-cols-4 gap-2 text-xs">
-                <div><span className="text-muted-foreground">Mat: </span><span className="font-semibold">{stats.ranji.matches}</span></div>
-                {stats.ranji.runs != null && <div><span className="text-muted-foreground">Runs: </span><span className="font-semibold">{stats.ranji.runs}</span></div>}
-                {stats.ranji.avg != null && <div><span className="text-muted-foreground">Avg: </span><span className="font-semibold">{stats.ranji.avg}</span></div>}
-                {stats.ranji.wickets != null && <div><span className="text-muted-foreground">Wkts: </span><span className="font-semibold">{stats.ranji.wickets}</span></div>}
+              <div className="text-[10px] font-semibold text-chart-3 uppercase tracking-wider mb-1.5">Phase Performance</div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div><span className="text-muted-foreground">PP SR: </span><span className="font-semibold">{stats.phases.powerplay.bat_sr}</span></div>
+                <div><span className="text-muted-foreground">Death SR: </span><span className="font-semibold">{stats.phases.death.bat_sr}</span></div>
+                {stats.phases.powerplay.bowl_economy > 0 && <div><span className="text-muted-foreground">PP Econ: </span><span className="font-semibold">{stats.phases.powerplay.bowl_economy}</span></div>}
+                {stats.phases.death.bowl_economy > 0 && <div><span className="text-muted-foreground">Death Econ: </span><span className="font-semibold">{stats.phases.death.bowl_economy}</span></div>}
               </div>
             </div>
           )}

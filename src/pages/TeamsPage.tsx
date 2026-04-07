@@ -25,7 +25,7 @@ function getTeamPlayers(teamName: string) {
 function PlayerRow({ player, index }: { player: Player; index: number }) {
   const { addToShortlist, isInShortlist, setCompareSlot, compareSlots } = useAppStore()
   const inShortlist = isInShortlist(player.id)
-  const primaryStat = player.stats.ipl || player.stats.t20i || player.stats.ranji
+  const primaryStat = player.stats.ipl
 
   return (
     <motion.div

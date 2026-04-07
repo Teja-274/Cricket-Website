@@ -41,11 +41,13 @@ export function PlayerProfilePage() {
   const formatStats = useMemo(() => {
     if (!player) return []
     const entries: { format: string; stats: Record<string, number> }[] = []
-    if (player.stats.ipl) entries.push({ format: 'IPL', stats: player.stats.ipl as Record<string, number> })
-    if (player.stats.t20i) entries.push({ format: 'T20I', stats: player.stats.t20i as Record<string, number> })
-    if (player.stats.odi) entries.push({ format: 'ODI', stats: player.stats.odi as Record<string, number> })
-    if (player.stats.ranji) entries.push({ format: 'Ranji', stats: player.stats.ranji as Record<string, number> })
-    if (player.stats.lista) entries.push({ format: 'List A', stats: player.stats.lista as Record<string, number> })
+    if (player.stats.ipl) entries.push({ format: 'IPL', stats: player.stats.ipl as unknown as Record<string, number> })
+    // Add season-by-season breakdown if available
+    if (player.stats.seasons) {
+      for (const [season, sStats] of Object.entries(player.stats.seasons)) {
+        entries.push({ format: season, stats: sStats as unknown as Record<string, number> })
+      }
+    }
     return entries
   }, [player])
 
@@ -60,9 +62,9 @@ export function PlayerProfilePage() {
 
   const radarData = useMemo(() => {
     if (!player) return []
-    const allStats = player.stats.ipl || player.stats.t20i || player.stats.ranji
+    const allStats = player.stats.ipl
     if (!allStats) return []
-    const s = allStats as Record<string, number>
+    const s = allStats as unknown as Record<string, number>
     const metrics = [
       { stat: 'Matches', value: Math.min((s.matches || 0) / 250 * 100, 100) },
       { stat: 'Runs', value: Math.min((s.runs || 0) / 8000 * 100, 100) },

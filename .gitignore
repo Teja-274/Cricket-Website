@@ -27,3 +27,7 @@ dist-ssr
 .env.local
 .env.production
 .vercel
+scripts/data/ipl_json/
+scripts/data/*.zip
+src/data/ipl_stats.json
+src/data/players_mock.ts

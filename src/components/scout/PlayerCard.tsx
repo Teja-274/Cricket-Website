@@ -38,7 +38,7 @@ export function PlayerCard({ player, index }: { player: Player; index: number })
   const navigate = useNavigate()
   const { addToShortlist, isInShortlist, setCompareSlot, compareSlots } = useAppStore()
   const inShortlist = isInShortlist(player.id)
-  const primaryStat = player.stats.ipl || player.stats.t20i || player.stats.ranji
+  const primaryStat = player.stats.ipl
   const isInCompare = compareSlots[0]?.id === player.id || compareSlots[1]?.id === player.id
 
   return (

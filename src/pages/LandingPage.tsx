@@ -61,33 +61,32 @@ export function LandingPage() {
     <div className="min-h-screen overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center px-8">
-        {/* Stadium night background */}
+        {/* Stadium night background with real image */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Stadium image */}
+          <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+            style={{ backgroundImage: "url('/images/stadium-wide.jpg')" }} />
+
+          {/* Dark vignette overlay */}
+          <div className="absolute inset-0"
+            style={{ background: 'radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(7,13,18,0.8) 100%)' }} />
+
           {/* Floodlight beams from top corners */}
-          <div className="absolute -top-20 -left-20 w-[500px] h-[700px] opacity-[0.04]"
-            style={{ background: 'conic-gradient(from 120deg at 0% 0%, rgba(255,240,200,0.8) 0deg, transparent 35deg)' }} />
-          <div className="absolute -top-20 -right-20 w-[500px] h-[700px] opacity-[0.04]"
-            style={{ background: 'conic-gradient(from 200deg at 100% 0%, rgba(255,240,200,0.8) 0deg, transparent 35deg)' }} />
+          <div className="absolute -top-10 -left-10 w-[600px] h-[800px]"
+            style={{ background: 'conic-gradient(from 120deg at 0% 0%, rgba(255,240,200,0.15) 0deg, transparent 30deg)' }} />
+          <div className="absolute -top-10 -right-10 w-[600px] h-[800px]"
+            style={{ background: 'conic-gradient(from 210deg at 100% 0%, rgba(255,240,200,0.15) 0deg, transparent 30deg)' }} />
+
           {/* Center floodlight spill */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] opacity-[0.03]"
-            style={{ background: 'radial-gradient(ellipse at top, rgba(255,240,200,0.9), transparent 70%)' }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px]"
+            style={{ background: 'radial-gradient(ellipse at top, rgba(255,240,200,0.1), transparent 70%)' }} />
 
-          {/* Oval ground boundary */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full border border-green-800/20" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[650px] rounded-full border border-green-900/10" />
+          {/* Green outfield glow at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-[400px]"
+            style={{ background: 'linear-gradient(to top, rgba(10,60,30,0.3), transparent)' }} />
 
-          {/* Pitch rectangle in center */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60px] h-[200px] border border-amber-800/15 rounded-sm" />
-          {/* Crease lines */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[160px] w-[50px] h-[1px] bg-amber-700/15" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[160px] w-[50px] h-[1px] bg-amber-700/15" />
-
-          {/* Green outfield gradient at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-[300px]"
-            style={{ background: 'linear-gradient(to top, rgba(10,50,25,0.25), transparent)' }} />
-
-          {/* Subtle green ambient glow */}
-          <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-3xl bg-green-900/10" />
+          {/* Ground boundary oval */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full border border-green-500/10" />
         </div>
 
         <motion.div

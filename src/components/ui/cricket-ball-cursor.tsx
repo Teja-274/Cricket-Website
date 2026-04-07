@@ -104,31 +104,31 @@ export function CricketBallCursor() {
           <circle cx="50" cy="50" r="46" fill="url(#shine2)" />
 
           {/* Left seam - straight line, dotted like thread */}
-          <line x1="33" y1="10" x2="33" y2="90" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="3 3" />
+          <line x1="33" y1="10" x2="33" y2="90" stroke="#f0dcc0" strokeWidth="3" strokeDasharray="4 3" />
           {/* Right seam - straight line, dotted like thread */}
-          <line x1="67" y1="10" x2="67" y2="90" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="3 3" />
+          <line x1="67" y1="10" x2="67" y2="90" stroke="#f0dcc0" strokeWidth="3" strokeDasharray="4 3" />
 
           {/* Left stitch marks - straight horizontal dashes */}
-          <line x1="33" y1="16" x2="27" y2="14" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="24" x2="27" y2="22" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="32" x2="27" y2="30" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="40" x2="27" y2="38" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="48" x2="27" y2="47" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="56" x2="27" y2="56" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="64" x2="27" y2="64" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="72" x2="27" y2="72" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="33" y1="80" x2="27" y2="80" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="33" y1="16" x2="27" y2="14" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="24" x2="27" y2="22" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="32" x2="27" y2="30" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="40" x2="27" y2="38" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="48" x2="27" y2="47" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="56" x2="27" y2="56" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="64" x2="27" y2="64" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="72" x2="27" y2="72" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="33" y1="80" x2="27" y2="80" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
 
           {/* Right stitch marks - straight horizontal dashes */}
-          <line x1="67" y1="16" x2="73" y2="14" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="24" x2="73" y2="22" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="32" x2="73" y2="30" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="40" x2="73" y2="38" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="48" x2="73" y2="47" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="56" x2="73" y2="56" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="64" x2="73" y2="64" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="72" x2="73" y2="72" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
-          <line x1="67" y1="80" x2="73" y2="80" stroke="#f0dcc0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="67" y1="16" x2="73" y2="14" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="24" x2="73" y2="22" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="32" x2="73" y2="30" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="40" x2="73" y2="38" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="48" x2="73" y2="47" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="56" x2="73" y2="56" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="64" x2="73" y2="64" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="72" x2="73" y2="72" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
+          <line x1="67" y1="80" x2="73" y2="80" stroke="#f0dcc0" strokeWidth="2" strokeDasharray="2.5 2" />
 
           {/* Inner shadow for depth */}
           <circle cx="50" cy="50" r="44" fill="none" stroke="#300505" strokeWidth="2" opacity="0.2" />

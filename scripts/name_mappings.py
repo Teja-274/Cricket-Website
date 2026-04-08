@@ -133,15 +133,19 @@ VENUE_MAP = {
 # Maps raw season string → integer year
 # ============================================================
 def normalize_season(raw: str) -> int:
-    """Convert Cricsheet season format to integer year."""
+    """Convert Cricsheet season format to integer year.
+    Uses the FIRST year to avoid collisions (2020/21 → 2020, not 2021).
+    """
     raw = str(raw)
     if '/' in raw:
-        # "2007/08" → 2008, "2009/10" → 2010, "2020/21" → 2021
+        # "2007/08" → 2008, "2009/10" → 2010, "2020/21" → 2020
         parts = raw.split('/')
         base = int(parts[0])
         suffix = int(parts[1])
-        if suffix < 100:
-            return base + 1 if suffix > int(str(base)[-2:]) else base
+        # For early seasons where format is YYYY/YY and refers to next year
+        if base < 2015 and suffix < 100:
+            return base + 1
+        # For 2020/21, keep as 2020 to avoid collision with 2021
         return base
     return int(raw)
 

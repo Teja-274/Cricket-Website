@@ -37,6 +37,7 @@ export async function getTopBatsmen(limit = 20) {
     .from('player_match_stats')
     .select('player_id, match_id, runs_scored, balls_faced, fours, sixes, is_not_out, players!inner(name)')
     .gt('balls_faced', 0)
+    .range(0, 50000)
   if (!data) return []
 
   const map = new Map<string, { id: string; name: string; runs: number; balls: number; matches: Set<string>; fours: number; sixes: number; not_outs: number; innings: number }>()
@@ -76,6 +77,7 @@ export async function getTopBowlers(limit = 20) {
     .from('player_match_stats')
     .select('player_id, match_id, wickets_taken, runs_conceded, overs_bowled, dots_bowled, players!inner(name)')
     .gt('overs_bowled', 0)
+    .range(0, 50000)
   if (!data) return []
 
   const map = new Map<string, { id: string; name: string; wickets: number; runs: number; overs: number; dots: number; matches: Set<string>; innings: number }>()
@@ -119,6 +121,7 @@ export async function getPlayerBattingMatchups(playerId: string) {
     .select('bowler_id, batter_runs, is_legal, is_boundary, is_dot, players!deliveries_bowler_id_fkey(name)')
     .eq('batter_id', playerId)
     .eq('is_legal', true)
+    .range(0, 50000)
   if (!data) return []
 
   const map = new Map<string, { name: string; balls: number; runs: number; boundaries: number; dots: number }>()
@@ -168,6 +171,7 @@ export async function getPlayerBowlingMatchups(playerId: string) {
     .select('batter_id, batter_runs, is_legal, is_boundary, is_dot, players!deliveries_batter_id_fkey(name)')
     .eq('bowler_id', playerId)
     .eq('is_legal', true)
+    .range(0, 50000)
   if (!data) return []
 
   const map = new Map<string, { name: string; balls: number; runs: number; boundaries: number; dots: number }>()
@@ -222,6 +226,7 @@ export async function getHeadToHead(player1Id: string, player2Id: string) {
     .select('batter_runs, is_legal, is_boundary, is_dot, over_number, phase')
     .eq('batter_id', player1Id)
     .eq('bowler_id', player2Id)
+    .range(0, 5000)
 
   // Player 2 batting vs Player 1 bowling
   const { data: p2Bat } = await supabase
@@ -229,6 +234,7 @@ export async function getHeadToHead(player1Id: string, player2Id: string) {
     .select('batter_runs, is_legal, is_boundary, is_dot, over_number, phase')
     .eq('batter_id', player2Id)
     .eq('bowler_id', player1Id)
+    .range(0, 5000)
 
   // Wickets
   const { data: w1 } = await supabase.from('wickets').select('kind').eq('batter_id', player1Id).eq('bowler_id', player2Id)
@@ -353,6 +359,7 @@ export async function getSeasonLeaderboard(seasonYear: number) {
     .from('player_match_stats')
     .select('player_id, runs_scored, balls_faced, fours, sixes, is_not_out, wickets_taken, runs_conceded, overs_bowled, dots_bowled, players!inner(name)')
     .eq('season_id', season.id)
+    .range(0, 10000)
   if (!stats) return { batsmen: [], bowlers: [], matches: matchCount?.length || 0 }
 
   // Aggregate batsmen

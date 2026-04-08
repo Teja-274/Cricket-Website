@@ -12,6 +12,10 @@ import { PlayerProfilePage } from '@/pages/PlayerProfilePage'
 import { AuctionResultsPage } from '@/pages/AuctionResultsPage'
 import { StrategyPage } from '@/pages/StrategyPage'
 import { LoginPage } from '@/pages/LoginPage'
+import { AnalyticsPage } from '@/pages/AnalyticsPage'
+import { HeadToHeadPage } from '@/pages/HeadToHeadPage'
+import { VenuesPage } from '@/pages/VenuesPage'
+import { SeasonPage } from '@/pages/SeasonPage'
 import { CricketBallCursor } from '@/components/ui/cricket-ball-cursor'
 
 export default function App() {
@@ -33,6 +37,11 @@ export default function App() {
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/shortlist" element={<ShortlistPage />} />
           <Route path="/strategy" element={<StrategyPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/h2h" element={<HeadToHeadPage />} />
+          <Route path="/venues" element={<VenuesPage />} />
+          <Route path="/season/:year" element={<SeasonPage />} />
+          <Route path="/season" element={<SeasonPage />} />
         </Route>
       </Routes>
       <CricketBallCursor />

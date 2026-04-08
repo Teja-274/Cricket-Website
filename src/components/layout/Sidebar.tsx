@@ -10,6 +10,10 @@ import {
   ChevronRight,
   Shield,
   Target,
+  BarChart3,
+  Swords,
+  MapPin,
+  Calendar,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -23,6 +27,10 @@ const navItems = [
   { to: '/compare', icon: GitCompareArrows, label: 'Compare' },
   { to: '/shortlist', icon: Star, label: 'Shortlist' },
   { to: '/strategy', icon: Target, label: 'Strategy' },
+  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/h2h', icon: Swords, label: 'Head-to-Head' },
+  { to: '/venues', icon: MapPin, label: 'Venues' },
+  { to: '/season', icon: Calendar, label: 'Seasons' },
 ]
 
 interface SidebarProps {

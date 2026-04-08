@@ -31,3 +31,5 @@ scripts/data/ipl_json/
 scripts/data/*.zip
 src/data/ipl_stats.json
 src/data/players_mock.ts
+supabase/data/deliveries.csv
+supabase/data/player_match_stats.json

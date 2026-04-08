@@ -1,0 +1,313 @@
+[
+  {
+    "id": 1,
+    "name": "ACA-VDCA Stadium",
+    "city": "Visakhapatnam",
+    "raw_names": [
+      "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium",
+      "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium, Visakhapatnam"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Arun Jaitley Stadium",
+    "city": "Delhi",
+    "raw_names": [
+      "Arun Jaitley Stadium",
+      "Arun Jaitley Stadium, Delhi",
+      "Feroz Shah Kotla"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Barabati Stadium",
+    "city": "Cuttack",
+    "raw_names": [
+      "Barabati Stadium"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Barsapara Stadium",
+    "city": "Guwahati",
+    "raw_names": [
+      "Barsapara Cricket Stadium, Guwahati"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Brabourne Stadium",
+    "city": "Mumbai",
+    "raw_names": [
+      "Brabourne Stadium",
+      "Brabourne Stadium, Mumbai"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Buffalo Park",
+    "city": "East London",
+    "raw_names": [
+      "Buffalo Park"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "DY Patil Stadium",
+    "city": "Mumbai",
+    "raw_names": [
+      "Dr DY Patil Sports Academy",
+      "Dr DY Patil Sports Academy, Mumbai"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Diamond Oval",
+    "city": "Kimberley",
+    "raw_names": [
+      "De Beers Diamond Oval"
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Dubai International Stadium",
+    "city": "Dubai",
+    "raw_names": [
+      "Dubai International Cricket Stadium"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Eden Gardens",
+    "city": "Kolkata",
+    "raw_names": [
+      "Eden Gardens",
+      "Eden Gardens, Kolkata"
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Ekana Stadium",
+    "city": "Lucknow",
+    "raw_names": [
+      "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Green Park",
+    "city": "Kanpur",
+    "raw_names": [
+      "Green Park"
+    ]
+  },
+  {
+    "id": 13,
+    "name": "HPCA Stadium",
+    "city": "Dharamsala",
+    "raw_names": [
+      "Himachal Pradesh Cricket Association Stadium",
+      "Himachal Pradesh Cricket Association Stadium, Dharamsala"
+    ]
+  },
+  {
+    "id": 14,
+    "name": "Holkar Cricket Stadium",
+    "city": "Indore",
+    "raw_names": [
+      "Holkar Cricket Stadium"
+    ]
+  },
+  {
+    "id": 15,
+    "name": "JSCA Stadium",
+    "city": "Ranchi",
+    "raw_names": [
+      "JSCA International Stadium Complex"
+    ]
+  },
+  {
+    "id": 16,
+    "name": "Kingsmead",
+    "city": "Durban",
+    "raw_names": [
+      "Kingsmead"
+    ]
+  },
+  {
+    "id": 17,
+    "name": "M Chinnaswamy Stadium",
+    "city": "Bengaluru",
+    "raw_names": [
+      "M Chinnaswamy Stadium",
+      "M Chinnaswamy Stadium, Bengaluru",
+      "M.Chinnaswamy Stadium"
+    ]
+  },
+  {
+    "id": 18,
+    "name": "MA Chidambaram Stadium",
+    "city": "Chennai",
+    "raw_names": [
+      "MA Chidambaram Stadium",
+      "MA Chidambaram Stadium, Chepauk",
+      "MA Chidambaram Stadium, Chepauk, Chennai"
+    ]
+  },
+  {
+    "id": 19,
+    "name": "MCA Stadium",
+    "city": "Pune",
+    "raw_names": [
+      "Maharashtra Cricket Association Stadium",
+      "Maharashtra Cricket Association Stadium, Pune",
+      "Subrata Roy Sahara Stadium"
+    ]
+  },
+  {
+    "id": 20,
+    "name": "MYSI Stadium",
+    "city": "Mullanpur",
+    "raw_names": [
+      "Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur",
+      "Maharaja Yadavindra Singh International Cricket Stadium, New Chandigarh"
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Narendra Modi Stadium",
+    "city": "Ahmedabad",
+    "raw_names": [
+      "Narendra Modi Stadium, Ahmedabad",
+      "Sardar Patel Stadium, Motera"
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Nehru Stadium",
+    "city": "Kochi",
+    "raw_names": [
+      "Nehru Stadium"
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Newlands",
+    "city": "Cape Town",
+    "raw_names": [
+      "Newlands"
+    ]
+  },
+  {
+    "id": 24,
+    "name": "OUTsurance Oval",
+    "city": "Bloemfontein",
+    "raw_names": [
+      "OUTsurance Oval"
+    ]
+  },
+  {
+    "id": 25,
+    "name": "PCA Stadium",
+    "city": "Mohali",
+    "raw_names": [
+      "Punjab Cricket Association IS Bindra Stadium",
+      "Punjab Cricket Association IS Bindra Stadium, Mohali",
+      "Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh",
+      "Punjab Cricket Association Stadium, Mohali"
+    ]
+  },
+  {
+    "id": 26,
+    "name": "Rajiv Gandhi International Stadium",
+    "city": "Hyderabad",
+    "raw_names": [
+      "Rajiv Gandhi International Stadium",
+      "Rajiv Gandhi International Stadium, Uppal",
+      "Rajiv Gandhi International Stadium, Uppal, Hyderabad"
+    ]
+  },
+  {
+    "id": 27,
+    "name": "SCA Stadium",
+    "city": "Rajkot",
+    "raw_names": [
+      "Saurashtra Cricket Association Stadium"
+    ]
+  },
+  {
+    "id": 28,
+    "name": "Sawai Mansingh Stadium",
+    "city": "Jaipur",
+    "raw_names": [
+      "Sawai Mansingh Stadium",
+      "Sawai Mansingh Stadium, Jaipur"
+    ]
+  },
+  {
+    "id": 29,
+    "name": "Sharjah Cricket Stadium",
+    "city": "Sharjah",
+    "raw_names": [
+      "Sharjah Cricket Stadium"
+    ]
+  },
+  {
+    "id": 30,
+    "name": "Sheikh Zayed Stadium",
+    "city": "Abu Dhabi",
+    "raw_names": [
+      "Sheikh Zayed Stadium",
+      "Zayed Cricket Stadium, Abu Dhabi"
+    ]
+  },
+  {
+    "id": 31,
+    "name": "St George's Park",
+    "city": "Gqeberha",
+    "raw_names": [
+      "St George's Park"
+    ]
+  },
+  {
+    "id": 32,
+    "name": "SuperSport Park",
+    "city": "Centurion",
+    "raw_names": [
+      "SuperSport Park"
+    ]
+  },
+  {
+    "id": 33,
+    "name": "VCA Stadium",
+    "city": "Nagpur",
+    "raw_names": [
+      "Vidarbha Cricket Association Stadium, Jamtha"
+    ]
+  },
+  {
+    "id": 34,
+    "name": "VNS Stadium",
+    "city": "Raipur",
+    "raw_names": [
+      "Shaheed Veer Narayan Singh International Stadium"
+    ]
+  },
+  {
+    "id": 35,
+    "name": "Wanderers Stadium",
+    "city": "Johannesburg",
+    "raw_names": [
+      "New Wanderers Stadium"
+    ]
+  },
+  {
+    "id": 36,
+    "name": "Wankhede Stadium",
+    "city": "Mumbai",
+    "raw_names": [
+      "Wankhede Stadium",
+      "Wankhede Stadium, Mumbai"
+    ]
+  }
+]

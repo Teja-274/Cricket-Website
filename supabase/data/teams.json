@@ -1,0 +1,156 @@
+[
+  {
+    "id": 1,
+    "name": "Chennai Super Kings",
+    "short_name": "CSK",
+    "color": "#FCCA06",
+    "is_active": true,
+    "historical_names": [
+      "Chennai Super Kings"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Deccan Chargers",
+    "short_name": "DC*",
+    "color": "#4A4A4A",
+    "is_active": false,
+    "historical_names": [
+      "Deccan Chargers"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Delhi Capitals",
+    "short_name": "DC",
+    "color": "#004C93",
+    "is_active": true,
+    "historical_names": [
+      "Delhi Capitals",
+      "Delhi Daredevils"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Gujarat Lions",
+    "short_name": "GL",
+    "color": "#E04F16",
+    "is_active": false,
+    "historical_names": [
+      "Gujarat Lions"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Gujarat Titans",
+    "short_name": "GT",
+    "color": "#1C1C1C",
+    "is_active": true,
+    "historical_names": [
+      "Gujarat Titans"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Kochi Tuskers Kerala",
+    "short_name": "KTK",
+    "color": "#7B2D26",
+    "is_active": false,
+    "historical_names": [
+      "Kochi Tuskers Kerala"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Kolkata Knight Riders",
+    "short_name": "KKR",
+    "color": "#3A225D",
+    "is_active": true,
+    "historical_names": [
+      "Kolkata Knight Riders"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Lucknow Super Giants",
+    "short_name": "LSG",
+    "color": "#A72056",
+    "is_active": true,
+    "historical_names": [
+      "Lucknow Super Giants"
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Mumbai Indians",
+    "short_name": "MI",
+    "color": "#004BA0",
+    "is_active": true,
+    "historical_names": [
+      "Mumbai Indians"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Pune Warriors",
+    "short_name": "PWI",
+    "color": "#6B6B6B",
+    "is_active": false,
+    "historical_names": [
+      "Pune Warriors"
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Punjab Kings",
+    "short_name": "PBKS",
+    "color": "#ED1B24",
+    "is_active": true,
+    "historical_names": [
+      "Kings XI Punjab",
+      "Punjab Kings"
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Rajasthan Royals",
+    "short_name": "RR",
+    "color": "#EA1A85",
+    "is_active": true,
+    "historical_names": [
+      "Rajasthan Royals"
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Rising Pune Supergiant",
+    "short_name": "RPS",
+    "color": "#6B3FA0",
+    "is_active": false,
+    "historical_names": [
+      "Rising Pune Supergiant",
+      "Rising Pune Supergiants"
+    ]
+  },
+  {
+    "id": 14,
+    "name": "Royal Challengers Bengaluru",
+    "short_name": "RCB",
+    "color": "#EC1C24",
+    "is_active": true,
+    "historical_names": [
+      "Royal Challengers Bangalore",
+      "Royal Challengers Bengaluru"
+    ]
+  },
+  {
+    "id": 15,
+    "name": "Sunrisers Hyderabad",
+    "short_name": "SRH",
+    "color": "#FF822A",
+    "is_active": true,
+    "historical_names": [
+      "Sunrisers Hyderabad"
+    ]
+  }
+]

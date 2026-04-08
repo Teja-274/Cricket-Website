@@ -355,40 +355,51 @@ export async function getSeasonLeaderboard(seasonYear: number) {
 
   const { data: matchCount } = await supabase.from('matches').select('id', { count: 'exact' }).eq('season_id', season.id)
 
-  const { data: stats } = await supabase
-    .from('player_match_stats')
-    .select('player_id, runs_scored, balls_faced, fours, sixes, is_not_out, wickets_taken, runs_conceded, overs_bowled, dots_bowled, players!inner(name)')
-    .eq('season_id', season.id)
-    .range(0, 10000)
-  if (!stats) return { batsmen: [], bowlers: [], matches: matchCount?.length || 0 }
+  // Use RPC function for pre-aggregated data (no row limit issues)
+  const { data: stats, error } = await supabase.rpc('get_season_leaderboard', { season_yr: seasonYear })
 
-  // Aggregate batsmen
-  const batMap = new Map<string, { id: string; name: string; runs: number; balls: number; fours: number; sixes: number; innings: number; not_outs: number }>()
-  const bowlMap = new Map<string, { id: string; name: string; wickets: number; runs: number; overs: number; dots: number; innings: number }>()
-
-  for (const row of stats as any[]) {
-    const pid = row.player_id
-    // Batting
-    if (row.balls_faced > 0) {
-      if (!batMap.has(pid)) batMap.set(pid, { id: pid, name: row.players.name, runs: 0, balls: 0, fours: 0, sixes: 0, innings: 0, not_outs: 0 })
-      const b = batMap.get(pid)!
-      b.runs += row.runs_scored; b.balls += row.balls_faced; b.fours += row.fours; b.sixes += row.sixes; b.innings += 1
-      if (row.is_not_out) b.not_outs += 1
-    }
-    // Bowling
-    if (row.overs_bowled > 0) {
-      if (!bowlMap.has(pid)) bowlMap.set(pid, { id: pid, name: row.players.name, wickets: 0, runs: 0, overs: 0, dots: 0, innings: 0 })
-      const b = bowlMap.get(pid)!
-      b.wickets += row.wickets_taken; b.runs += row.runs_conceded; b.overs += row.overs_bowled; b.dots += row.dots_bowled; b.innings += 1
-    }
+  if (error || !stats) {
+    console.error('[Queries] Season leaderboard RPC error:', error)
+    return { batsmen: [], bowlers: [], matches: matchCount?.length || 0 }
   }
 
-  const batsmen = [...batMap.values()]
-    .map(b => ({ ...b, avg: b.innings - b.not_outs > 0 ? Math.round((b.runs / (b.innings - b.not_outs)) * 100) / 100 : 0, sr: b.balls > 0 ? Math.round((b.runs / b.balls) * 10000) / 100 : 0 }))
+  const batsmen = (stats as any[])
+    .filter(r => r.balls_faced > 0)
+    .map(r => ({
+      id: r.player_id,
+      name: r.player_name,
+      runs: Number(r.runs_scored),
+      balls: Number(r.balls_faced),
+      fours: Number(r.fours),
+      sixes: Number(r.sixes),
+      innings: Number(r.innings),
+      not_outs: Number(r.not_outs),
+      avg: (Number(r.innings) - Number(r.not_outs)) > 0
+        ? Math.round((Number(r.runs_scored) / (Number(r.innings) - Number(r.not_outs))) * 100) / 100
+        : 0,
+      sr: Number(r.balls_faced) > 0
+        ? Math.round((Number(r.runs_scored) / Number(r.balls_faced)) * 10000) / 100
+        : 0,
+    }))
     .sort((a, b) => b.runs - a.runs)
 
-  const bowlers = [...bowlMap.values()]
-    .map(b => ({ ...b, economy: b.overs > 0 ? Math.round((b.runs / b.overs) * 100) / 100 : 0, avg: b.wickets > 0 ? Math.round((b.runs / b.wickets) * 100) / 100 : 0 }))
+  const bowlers = (stats as any[])
+    .filter(r => Number(r.overs_bowled) > 0)
+    .map(r => ({
+      id: r.player_id,
+      name: r.player_name,
+      wickets: Number(r.wickets_taken),
+      runs: Number(r.runs_conceded),
+      overs: Math.round(Number(r.overs_bowled) * 10) / 10,
+      dots: Number(r.dots_bowled),
+      innings: Number(r.innings),
+      economy: Number(r.overs_bowled) > 0
+        ? Math.round((Number(r.runs_conceded) / Number(r.overs_bowled)) * 100) / 100
+        : 0,
+      avg: Number(r.wickets_taken) > 0
+        ? Math.round((Number(r.runs_conceded) / Number(r.wickets_taken)) * 100) / 100
+        : 0,
+    }))
     .sort((a, b) => b.wickets - a.wickets)
 
   return { batsmen, bowlers, matches: matchCount?.length || 0 }

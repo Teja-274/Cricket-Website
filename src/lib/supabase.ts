@@ -6,7 +6,10 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 export const isSupabaseConfigured = () => !!SUPABASE_URL && !!SUPABASE_ANON_KEY
 
 export const supabase = isSupabaseConfigured()
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      db: { schema: 'public' },
+      global: { headers: { 'apikey': SUPABASE_ANON_KEY } },
+    })
   : null
 
 // Auth helpers

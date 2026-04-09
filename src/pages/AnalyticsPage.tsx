@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { BarChart3, Trophy, Zap, Target, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +12,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { getTopBatsmen, getTopBowlers, getOverviewStats } from '@/lib/queries'
 
 export function AnalyticsPage() {
+  const navigate = useNavigate()
   const [batsmen, setBatsmen] = useState<any[]>([])
   const [bowlers, setBowlers] = useState<any[]>([])
   const [overview, setOverview] = useState<any>(null)
@@ -157,7 +159,8 @@ export function AnalyticsPage() {
                     <tbody>
                       {batsmen.slice(0, 15).map((b, i) => (
                         <motion.tr key={b.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
-                          className="border-b border-border/10 hover:bg-background/30">
+                          className="border-b border-border/10 hover:bg-background/30 cursor-pointer"
+                          onClick={() => navigate(`/player/${b.id}`)}>
                           <td className="p-3 text-muted-foreground">{i + 1}</td>
                           <td className="p-3 font-medium">{b.name}</td>
                           <td className="p-3 text-right">{b.matches}</td>
@@ -193,7 +196,8 @@ export function AnalyticsPage() {
                     <tbody>
                       {bowlers.slice(0, 15).map((b, i) => (
                         <motion.tr key={b.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
-                          className="border-b border-border/10 hover:bg-background/30">
+                          className="border-b border-border/10 hover:bg-background/30 cursor-pointer"
+                          onClick={() => navigate(`/player/${b.id}`)}>
                           <td className="p-3 text-muted-foreground">{i + 1}</td>
                           <td className="p-3 font-medium">{b.name}</td>
                           <td className="p-3 text-right">{b.matches}</td>

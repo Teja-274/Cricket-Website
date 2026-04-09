@@ -14,6 +14,8 @@ import {
   Swords,
   MapPin,
   Calendar,
+  Activity,
+  Crosshair,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -31,6 +33,9 @@ const navItems = [
   { to: '/h2h', icon: Swords, label: 'Head-to-Head' },
   { to: '/venues', icon: MapPin, label: 'Venues' },
   { to: '/season', icon: Calendar, label: 'Seasons' },
+  { to: '/matchups', icon: Crosshair, label: 'Matchups' },
+  { to: '/franchises', icon: Trophy, label: 'Franchises' },
+  { to: '/overs', icon: Activity, label: 'Over Analysis' },
 ]
 
 interface SidebarProps {

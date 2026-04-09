@@ -355,6 +355,73 @@ export async function getSeasonLeaderboard(seasonYear: number) {
 }
 
 // ============================================================
+// PLAYER PROFILE - Supabase-backed
+// ============================================================
+
+export async function getPlayerById(playerId: string) {
+  if (!supabase) return null
+  const { data } = await supabase.from('players').select('*').eq('id', playerId).single()
+  return data
+}
+
+export async function getPlayerCareerStats(playerId: string) {
+  if (!supabase) return null
+  const { data, error } = await supabase.rpc('get_player_career_stats', { p_id: playerId })
+  if (error || !data || (data as any[]).length === 0) return null
+  const r = (data as any[])[0]
+  return {
+    matches: Number(r.matches),
+    innings: Number(r.innings),
+    runs: Number(r.runs),
+    balls: Number(r.balls),
+    fours: Number(r.fours),
+    sixes: Number(r.sixes),
+    notOuts: Number(r.not_outs),
+    avg: (Number(r.innings) - Number(r.not_outs)) > 0
+      ? Math.round((Number(r.runs) / (Number(r.innings) - Number(r.not_outs))) * 100) / 100 : 0,
+    sr: Number(r.balls) > 0 ? Math.round((Number(r.runs) / Number(r.balls)) * 10000) / 100 : 0,
+    highestScore: Number(r.highest_score),
+    wickets: Number(r.wickets),
+    runsConceded: Number(r.runs_conceded),
+    overs: Math.round(Number(r.overs) * 10) / 10,
+    economy: Number(r.overs) > 0 ? Math.round((Number(r.runs_conceded) / Number(r.overs)) * 100) / 100 : 0,
+    bowlingAvg: Number(r.wickets) > 0 ? Math.round((Number(r.runs_conceded) / Number(r.wickets)) * 100) / 100 : 0,
+    dotsBowled: Number(r.dots_bowled),
+    catches: Number(r.catches),
+    stumpings: Number(r.stumpings),
+  }
+}
+
+export async function getPlayerSeasonHistorySupabase(playerId: string) {
+  if (!supabase) return []
+  const { data, error } = await supabase.rpc('get_player_seasons', { p_id: playerId })
+  if (error || !data) return []
+  return (data as any[]).map(r => ({
+    year: Number(r.year),
+    matches: Number(r.matches),
+    runs: Number(r.runs),
+    avg: Number(r.avg),
+    sr: Number(r.sr),
+    wickets: Number(r.wickets),
+    economy: Number(r.economy),
+  }))
+}
+
+export async function getPlayerVenuePerformance(playerId: string) {
+  if (!supabase) return []
+  const { data, error } = await supabase.rpc('get_player_venue_stats', { p_id: playerId })
+  if (error || !data) return []
+  return (data as any[]).map(r => ({
+    venue: r.venue,
+    matches: Number(r.matches),
+    runs: Number(r.runs),
+    balls: Number(r.balls),
+    avg: Number(r.avg || 0),
+    sr: Number(r.sr || 0),
+  }))
+}
+
+// ============================================================
 // SEASON CHAMPION
 // ============================================================
 

@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, User, Star, GitCompareArrows, Trophy, TrendingUp, MapPin, Calendar } from 'lucide-react'
+import { ArrowLeft, User, Star, GitCompareArrows, Trophy, TrendingUp, MapPin, Loader2, Swords, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
@@ -11,208 +11,235 @@ import { NumberTicker } from '@/components/magicui/number-ticker'
 import {
   ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig,
 } from '@/components/ui/line-chart'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts'
-import { PLAYERS } from '@/data/players'
-import { IPL_FRANCHISES } from '@/data/franchises'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart } from 'recharts'
+import {
+  getPlayerById, getPlayerCareerStats, getPlayerSeasonHistorySupabase,
+  getPlayerVenuePerformance, getPlayerBattingMatchups, getPlayerBowlingMatchups,
+  getPlayerDismissals,
+} from '@/lib/queries'
 import { useAppStore } from '@/store/appStore'
-
-const roleColors: Record<string, string> = {
-  'Batsman': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  'Bowler': 'bg-red-500/20 text-red-400 border-red-500/30',
-  'All-Rounder': 'bg-green-500/20 text-green-400 border-green-500/30',
-  'WK-Batsman': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-}
-
-const tierColors: Record<string, string> = {
-  'International Ready': 'text-amber-400 border-amber-500/30 bg-amber-500/10',
-  'IPL Proven': 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
-  'Domestic Star': 'text-sky-400 border-sky-500/30 bg-sky-500/10',
-  'Emerging Talent': 'text-violet-400 border-violet-500/30 bg-violet-500/10',
-}
 
 export function PlayerProfilePage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { addToShortlist, isInShortlist, setCompareSlot } = useAppStore()
+  const { addToShortlist } = useAppStore()
 
-  const player = PLAYERS.find(p => p.id === id)
-  const franchise = player ? IPL_FRANCHISES.find(f => f.name === player.iplTeam) : null
+  const [player, setPlayer] = useState<any>(null)
+  const [career, setCareer] = useState<any>(null)
+  const [seasons, setSeasons] = useState<any[]>([])
+  const [venues, setVenues] = useState<any[]>([])
+  const [battingMatchups, setBattingMatchups] = useState<any[]>([])
+  const [bowlingMatchups, setBowlingMatchups] = useState<any[]>([])
+  const [dismissals, setDismissals] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const formatStats = useMemo(() => {
-    if (!player) return []
-    const entries: { format: string; stats: Record<string, number> }[] = []
-    if (player.stats.ipl) entries.push({ format: 'IPL', stats: player.stats.ipl as unknown as Record<string, number> })
-    // Add season-by-season breakdown if available
-    if (player.stats.seasons) {
-      for (const [season, sStats] of Object.entries(player.stats.seasons)) {
-        entries.push({ format: season, stats: sStats as unknown as Record<string, number> })
-      }
-    }
-    return entries
-  }, [player])
+  useEffect(() => {
+    if (!id) return
+    setLoading(true)
+    Promise.all([
+      getPlayerById(id),
+      getPlayerCareerStats(id),
+      getPlayerSeasonHistorySupabase(id),
+      getPlayerVenuePerformance(id),
+      getPlayerBattingMatchups(id),
+      getPlayerBowlingMatchups(id),
+      getPlayerDismissals(id),
+    ]).then(([p, c, s, v, bat, bowl, d]) => {
+      setPlayer(p)
+      setCareer(c)
+      setSeasons(s)
+      setVenues(v)
+      setBattingMatchups(bat.slice(0, 15))
+      setBowlingMatchups(bowl.slice(0, 15))
+      setDismissals(d)
+      setLoading(false)
+    })
+  }, [id])
 
-  const barChartData = useMemo(() => {
-    return formatStats.map(f => ({
-      format: f.format,
-      matches: f.stats.matches || 0,
-      runs: f.stats.runs || 0,
-      wickets: f.stats.wickets || 0,
-    }))
-  }, [formatStats])
+  const chartConfig: ChartConfig = {
+    runs: { label: 'Runs', color: '#f5a623' },
+    wickets: { label: 'Wickets', color: '#22c55e' },
+    value: { label: 'Value', color: '#f5a623' },
+  }
 
-  const radarData = useMemo(() => {
-    if (!player) return []
-    const allStats = player.stats.ipl
-    if (!allStats) return []
-    const s = allStats as unknown as Record<string, number>
-    const metrics = [
-      { stat: 'Matches', value: Math.min((s.matches || 0) / 250 * 100, 100) },
-      { stat: 'Runs', value: Math.min((s.runs || 0) / 8000 * 100, 100) },
-      { stat: 'Average', value: Math.min((s.avg || 0) / 60 * 100, 100) },
-      { stat: 'Strike Rate', value: Math.min((s.sr || 0) / 200 * 100, 100) },
-      { stat: 'Wickets', value: Math.min((s.wickets || 0) / 200 * 100, 100) },
-      { stat: 'Economy', value: s.economy ? Math.max(0, 100 - (s.economy / 12 * 100)) : 0 },
-    ].filter(m => m.value > 0)
-    return metrics
-  }, [player])
-
-  if (!player) {
+  if (loading) {
     return (
-      <div className="min-h-screen p-8 flex flex-col items-center justify-center">
-        <p className="text-muted-foreground mb-4">Player not found.</p>
-        <Button variant="outline" onClick={() => navigate('/scout')}>Back to Scout</Button>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin mr-3" />
+        <span className="text-muted-foreground">Loading player profile...</span>
       </div>
     )
   }
 
-  const inShortlist = isInShortlist(player.id)
-  const chartConfig: ChartConfig = {
-    matches: { label: 'Matches', color: '#f59e0b' },
-    runs: { label: 'Runs', color: '#22c55e' },
-    wickets: { label: 'Wickets', color: '#ef4444' },
-    value: { label: 'Score', color: '#f59e0b' },
+  if (!player) {
+    return (
+      <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+        <User className="w-16 h-16 text-muted-foreground/20 mb-4" />
+        <p className="text-muted-foreground mb-4">Player not found.</p>
+        <Button variant="outline" onClick={() => navigate('/analytics')}>Back to Analytics</Button>
+      </div>
+    )
   }
+
+  const isBatsman = (career?.runs || 0) > 100
+  const isBowler = (career?.wickets || 0) > 10
 
   return (
     <div className="min-h-screen p-6 lg:p-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto">
-        {/* Back */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />Back
         </Button>
 
-        {/* Hero Card */}
-        <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden mb-6"
-          style={{ background: franchise ? `linear-gradient(135deg, ${franchise.color}10, transparent)` : undefined }}>
-          {franchise && <BorderBeam size={300} duration={10} colorFrom={franchise.color} colorTo={`${franchise.color}60`} />}
-
+        {/* Hero */}
+        <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden mb-6">
+          <BorderBeam size={300} duration={10} colorFrom="#f5a623" colorTo="#22c55e" />
           <div className="p-6 lg:p-8">
             <div className="flex flex-col md:flex-row gap-6 items-start">
-              {/* Avatar */}
-              <div className="w-24 h-24 rounded-2xl bg-accent/50 flex items-center justify-center ring-2 ring-border/30 shrink-0"
-                style={franchise ? { borderColor: `${franchise.color}40` } : {}}>
+              <div className="w-24 h-24 rounded-2xl bg-accent/50 flex items-center justify-center ring-2 ring-border/30 shrink-0">
                 <User className="w-12 h-12 text-muted-foreground" />
               </div>
-
-              {/* Info */}
               <div className="flex-1">
                 <h1 className="text-4xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>{player.name}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <Badge className={roleColors[player.role]}>{player.role}</Badge>
-                  <Badge className={tierColors[player.tier]}>{player.tier}</Badge>
-                  {player.isCapped && <Badge variant="outline" className="border-amber-500/30 text-amber-400">International</Badge>}
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">{player.role || 'Batsman'}</Badge>
+                  <Badge variant="outline">{player.batting_style || 'Right-Hand'}</Badge>
+                  {player.bowling_style && player.bowling_style !== 'None' && (
+                    <Badge variant="outline">{player.bowling_style}</Badge>
+                  )}
                 </div>
-                <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{player.state}</span>
-                  <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />Age: {player.age}</span>
-                  <span>{player.battingStyle} Bat</span>
-                  {player.bowlingStyle !== 'None' && <span>{player.bowlingStyle}</span>}
-                  {franchise && <span className="font-medium" style={{ color: franchise.color }}>{franchise.shortName}</span>}
-                </div>
+                <div className="text-xs text-muted-foreground mt-2">Short name: {player.short_name}</div>
               </div>
-
-              {/* Price & Actions */}
-              <div className="text-right shrink-0">
-                <div className="text-xs text-muted-foreground uppercase mb-1">Base Price</div>
-                <div className="text-4xl font-bold text-primary" style={{ fontFamily: 'var(--font-heading)' }}>
-                  <NumberTicker value={player.basePriceCr} decimalPlaces={1} /> Cr
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" variant={inShortlist ? 'default' : 'outline'} onClick={() => addToShortlist(player)} disabled={inShortlist} className="rounded-lg">
-                    <Star className="w-3.5 h-3.5 mr-1" />{inShortlist ? 'Listed' : 'Shortlist'}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => { setCompareSlot(0, player); navigate('/compare') }} className="rounded-lg">
-                    <GitCompareArrows className="w-3.5 h-3.5 mr-1" />Compare
-                  </Button>
-                </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => addToShortlist({ id: player.id, name: player.name, role: 'Batsman', battingStyle: 'Right-Hand', bowlingStyle: 'None', state: 'India', iplTeam: 'None', basePriceCr: 1, isCapped: true, tier: 'IPL Proven', age: 28, stats: { ipl: { matches: career?.matches || 0 } }, status: 'pending' } as any)}>
+                  <Star className="w-3.5 h-3.5 mr-1" />Shortlist
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => navigate('/h2h')}>
+                  <GitCompareArrows className="w-3.5 h-3.5 mr-1" />H2H
+                </Button>
               </div>
             </div>
+
+            {/* Career stats row */}
+            {career && (
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mt-6">
+                <div className="p-3 rounded-xl bg-background/50 text-center">
+                  <div className="text-[10px] text-muted-foreground uppercase">Matches</div>
+                  <div className="text-2xl font-bold text-primary" style={{ fontFamily: 'var(--font-heading)' }}>
+                    <NumberTicker value={career.matches} />
+                  </div>
+                </div>
+                {isBatsman && (
+                  <>
+                    <div className="p-3 rounded-xl bg-background/50 text-center">
+                      <div className="text-[10px] text-muted-foreground uppercase">Runs</div>
+                      <div className="text-2xl font-bold text-chart-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                        <NumberTicker value={career.runs} />
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-background/50 text-center">
+                      <div className="text-[10px] text-muted-foreground uppercase">Average</div>
+                      <div className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>{career.avg}</div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-background/50 text-center">
+                      <div className="text-[10px] text-muted-foreground uppercase">Strike Rate</div>
+                      <div className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>{career.sr}</div>
+                    </div>
+                  </>
+                )}
+                {isBowler && (
+                  <>
+                    <div className="p-3 rounded-xl bg-background/50 text-center">
+                      <div className="text-[10px] text-muted-foreground uppercase">Wickets</div>
+                      <div className="text-2xl font-bold text-chart-4" style={{ fontFamily: 'var(--font-heading)' }}>
+                        <NumberTicker value={career.wickets} />
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-background/50 text-center">
+                      <div className="text-[10px] text-muted-foreground uppercase">Economy</div>
+                      <div className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>{career.economy}</div>
+                    </div>
+                  </>
+                )}
+                {!isBowler && isBatsman && (
+                  <>
+                    <div className="p-3 rounded-xl bg-background/50 text-center">
+                      <div className="text-[10px] text-muted-foreground uppercase">HS</div>
+                      <div className="text-2xl font-bold text-destructive" style={{ fontFamily: 'var(--font-heading)' }}>{career.highestScore}</div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-background/50 text-center">
+                      <div className="text-[10px] text-muted-foreground uppercase">Sixes</div>
+                      <div className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>{career.sixes}</div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Stats Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
+        {/* Tabs */}
+        <Tabs defaultValue="overview">
           <TabsList className="bg-card/80 backdrop-blur-sm rounded-xl">
             <TabsTrigger value="overview" className="rounded-lg">Overview</TabsTrigger>
-            <TabsTrigger value="formats" className="rounded-lg">By Format</TabsTrigger>
-            <TabsTrigger value="charts" className="rounded-lg">Charts</TabsTrigger>
+            <TabsTrigger value="seasons" className="rounded-lg">Seasons</TabsTrigger>
+            <TabsTrigger value="venues" className="rounded-lg">Venues</TabsTrigger>
+            <TabsTrigger value="matchups" className="rounded-lg">Matchups</TabsTrigger>
+            <TabsTrigger value="dismissals" className="rounded-lg">Dismissals</TabsTrigger>
           </TabsList>
 
           {/* Overview */}
-          <TabsContent value="overview">
-            <div className="grid md:grid-cols-2 gap-6">
-              {formatStats.map(f => (
-                <motion.div key={f.format} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 p-5">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
-                    <Trophy className="w-4 h-4 inline mr-1.5 -mt-0.5" />{f.format}
-                  </h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    {Object.entries(f.stats).map(([key, val]) => {
-                      const labels: Record<string, string> = { matches: 'Matches', runs: 'Runs', avg: 'Average', sr: 'Strike Rate', wickets: 'Wickets', economy: 'Economy' }
-                      return (
-                        <div key={key} className="p-2.5 rounded-lg bg-background/50">
-                          <div className="text-[10px] text-muted-foreground uppercase">{labels[key] || key}</div>
-                          <div className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)' }}>{val}</div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </motion.div>
-              ))}
-              {formatStats.length === 0 && (
-                <p className="text-muted-foreground col-span-2 text-center py-8">No detailed stats available.</p>
-              )}
-            </div>
+          <TabsContent value="overview" className="mt-6">
+            {seasons.length > 0 ? (
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                    <TrendingUp className="w-4 h-4 text-primary" />CAREER TIMELINE
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={chartConfig} className="h-[300px]">
+                    <LineChart data={seasons} margin={{ left: -10, right: 10 }}>
+                      <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.3} />
+                      <XAxis dataKey="year" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                      <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      {isBatsman && <Line type="monotone" dataKey="runs" stroke="#f5a623" strokeWidth={3} dot={{ fill: '#f5a623', r: 4 }} />}
+                      {isBowler && <Line type="monotone" dataKey="wickets" stroke="#22c55e" strokeWidth={3} dot={{ fill: '#22c55e', r: 4 }} />}
+                    </LineChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            ) : <p className="text-center py-8 text-muted-foreground">No season data available.</p>}
           </TabsContent>
 
-          {/* By Format - detailed table */}
-          <TabsContent value="formats">
+          {/* Seasons */}
+          <TabsContent value="seasons" className="mt-6">
             <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border/30">
-                      <th className="text-left p-4 text-xs uppercase text-muted-foreground font-bold">Format</th>
-                      <th className="text-center p-4 text-xs uppercase text-muted-foreground font-bold">Mat</th>
-                      <th className="text-center p-4 text-xs uppercase text-muted-foreground font-bold">Runs</th>
-                      <th className="text-center p-4 text-xs uppercase text-muted-foreground font-bold">Avg</th>
-                      <th className="text-center p-4 text-xs uppercase text-muted-foreground font-bold">SR</th>
-                      <th className="text-center p-4 text-xs uppercase text-muted-foreground font-bold">Wkts</th>
-                      <th className="text-center p-4 text-xs uppercase text-muted-foreground font-bold">Econ</th>
+                    <tr className="border-b border-border/20 text-[10px] uppercase text-muted-foreground">
+                      <th className="text-left p-3">Year</th>
+                      <th className="text-right p-3">Mat</th>
+                      <th className="text-right p-3">Runs</th>
+                      <th className="text-right p-3">Avg</th>
+                      <th className="text-right p-3">SR</th>
+                      <th className="text-right p-3">Wkts</th>
+                      <th className="text-right p-3">Econ</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {formatStats.map((f, i) => (
-                      <motion.tr key={f.format} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
-                        className="border-b border-border/10 hover:bg-background/30 transition-colors">
-                        <td className="p-4 font-bold text-primary" style={{ fontFamily: 'var(--font-heading)' }}>{f.format}</td>
-                        <td className="p-4 text-center font-medium">{f.stats.matches ?? '—'}</td>
-                        <td className="p-4 text-center font-medium">{f.stats.runs ?? '—'}</td>
-                        <td className="p-4 text-center font-medium">{f.stats.avg ?? '—'}</td>
-                        <td className="p-4 text-center font-medium">{f.stats.sr ?? '—'}</td>
-                        <td className="p-4 text-center font-medium">{f.stats.wickets ?? '—'}</td>
-                        <td className="p-4 text-center font-medium">{f.stats.economy ?? '—'}</td>
+                    {seasons.map((s, i) => (
+                      <motion.tr key={s.year} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
+                        className="border-b border-border/10 hover:bg-background/30">
+                        <td className="p-3 font-bold text-primary">IPL {s.year}</td>
+                        <td className="p-3 text-right">{s.matches}</td>
+                        <td className="p-3 text-right font-bold">{s.runs || '—'}</td>
+                        <td className="p-3 text-right">{s.avg || '—'}</td>
+                        <td className="p-3 text-right">{s.sr || '—'}</td>
+                        <td className="p-3 text-right font-bold">{s.wickets || '—'}</td>
+                        <td className="p-3 text-right">{s.economy || '—'}</td>
                       </motion.tr>
                     ))}
                   </tbody>
@@ -221,59 +248,136 @@ export function PlayerProfilePage() {
             </div>
           </TabsContent>
 
-          {/* Charts */}
-          <TabsContent value="charts">
-            <div className="grid md:grid-cols-2 gap-6">
-              {barChartData.length > 0 && (
-                <Card className="bg-card/80 backdrop-blur-sm border-border/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
-                      <TrendingUp className="w-4 h-4 inline mr-1.5 text-primary" />ACROSS FORMATS
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ChartContainer config={chartConfig} className="h-[280px]">
-                      <BarChart data={barChartData} margin={{ left: -10, right: 10 }}>
-                        <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.3} />
-                        <XAxis dataKey="format" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-                        <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="matches" fill="#f59e0b" radius={[4, 4, 0, 0]} barSize={18} filter="url(#glow-p)" />
-                        <Bar dataKey="runs" fill="#22c55e" radius={[4, 4, 0, 0]} barSize={18} filter="url(#glow-p)" />
-                        <Bar dataKey="wickets" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={18} filter="url(#glow-p)" />
-                        <defs>
-                          <filter id="glow-p" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur stdDeviation="4" result="blur" />
-                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                          </filter>
-                        </defs>
-                      </BarChart>
-                    </ChartContainer>
-                  </CardContent>
-                </Card>
-              )}
+          {/* Venues */}
+          <TabsContent value="venues" className="mt-6">
+            {venues.length > 0 ? (
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                    <MapPin className="w-4 h-4 text-primary" />BEST VENUES
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={chartConfig} className="h-[400px]">
+                    <BarChart data={venues.slice(0, 10)} layout="vertical" margin={{ left: 120, right: 10 }}>
+                      <CartesianGrid horizontal={false} stroke="var(--border)" strokeOpacity={0.3} />
+                      <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
+                      <YAxis type="category" dataKey="venue" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} width={115} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="runs" fill="#f5a623" radius={[0, 4, 4, 0]} barSize={14} />
+                    </BarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            ) : <p className="text-center py-8 text-muted-foreground">No venue data available.</p>}
+          </TabsContent>
 
-              {radarData.length >= 3 && (
-                <Card className="bg-card/80 backdrop-blur-sm border-border/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
-                      <TrendingUp className="w-4 h-4 inline mr-1.5 text-chart-3" />SKILL RADAR
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[280px]">
-                      <RadarChart data={radarData}>
-                        <PolarGrid stroke="var(--border)" />
-                        <PolarAngleAxis dataKey="stat" tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                        <Radar dataKey="value" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.25} strokeWidth={2} />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                      </RadarChart>
-                    </ChartContainer>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+          {/* Matchups */}
+          <TabsContent value="matchups" className="mt-6">
+            {isBatsman && battingMatchups.length > 0 && (
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 overflow-hidden mb-4">
+                <div className="p-4 border-b border-border/30 flex items-center gap-2">
+                  <Swords className="w-4 h-4 text-primary" />
+                  <h3 className="text-sm font-bold uppercase" style={{ fontFamily: 'var(--font-heading)' }}>VS BOWLERS (Batting)</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border/20 text-[10px] uppercase text-muted-foreground">
+                        <th className="text-left p-3">Bowler</th>
+                        <th className="text-right p-3">Balls</th>
+                        <th className="text-right p-3">Runs</th>
+                        <th className="text-right p-3">SR</th>
+                        <th className="text-right p-3">4s/6s</th>
+                        <th className="text-right p-3">Out</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {battingMatchups.map((b, i) => (
+                        <motion.tr key={b.bowler_id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
+                          className="border-b border-border/10 hover:bg-background/30">
+                          <td className="p-3 font-medium">{b.bowler_name}</td>
+                          <td className="p-3 text-right">{b.balls}</td>
+                          <td className="p-3 text-right font-bold text-primary">{b.runs}</td>
+                          <td className="p-3 text-right">{b.sr}</td>
+                          <td className="p-3 text-right">{b.boundaries}</td>
+                          <td className="p-3 text-right text-destructive">{b.dismissals}</td>
+                        </motion.tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {isBowler && bowlingMatchups.length > 0 && (
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 overflow-hidden">
+                <div className="p-4 border-b border-border/30 flex items-center gap-2">
+                  <Target className="w-4 h-4 text-chart-2" />
+                  <h3 className="text-sm font-bold uppercase" style={{ fontFamily: 'var(--font-heading)' }}>VS BATSMEN (Bowling)</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border/20 text-[10px] uppercase text-muted-foreground">
+                        <th className="text-left p-3">Batsman</th>
+                        <th className="text-right p-3">Balls</th>
+                        <th className="text-right p-3">Runs</th>
+                        <th className="text-right p-3">SR</th>
+                        <th className="text-right p-3">Dots</th>
+                        <th className="text-right p-3">Wkts</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bowlingMatchups.map((b, i) => (
+                        <motion.tr key={b.batter_id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
+                          className="border-b border-border/10 hover:bg-background/30">
+                          <td className="p-3 font-medium">{b.batter_name}</td>
+                          <td className="p-3 text-right">{b.balls}</td>
+                          <td className="p-3 text-right">{b.runs}</td>
+                          <td className="p-3 text-right">{b.sr}</td>
+                          <td className="p-3 text-right">{b.dots}</td>
+                          <td className="p-3 text-right font-bold text-chart-2">{b.dismissals}</td>
+                        </motion.tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Dismissals */}
+          <TabsContent value="dismissals" className="mt-6">
+            {dismissals.length > 0 ? (
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                    <Trophy className="w-4 h-4 text-destructive" />HOW OUT
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {dismissals.map((d, i) => {
+                      const total = dismissals.reduce((s, x) => s + x.count, 0)
+                      const pct = Math.round((d.count / total) * 100)
+                      return (
+                        <motion.div key={d.kind} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium capitalize">{d.kind}</span>
+                            <span className="text-muted-foreground">{d.count} ({pct}%)</span>
+                          </div>
+                          <div className="h-2 bg-background/50 rounded-full overflow-hidden">
+                            <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, delay: i * 0.05 }}
+                              className="h-full bg-gradient-to-r from-destructive to-destructive/70 rounded-full" />
+                          </div>
+                        </motion.div>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : <p className="text-center py-8 text-muted-foreground">No dismissal data available.</p>}
           </TabsContent>
         </Tabs>
       </motion.div>

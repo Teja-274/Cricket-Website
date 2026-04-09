@@ -16,6 +16,10 @@ import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { HeadToHeadPage } from '@/pages/HeadToHeadPage'
 import { VenuesPage } from '@/pages/VenuesPage'
 import { SeasonPage } from '@/pages/SeasonPage'
+import { MatchupExplorerPage } from '@/pages/MatchupExplorerPage'
+import { FranchisePage } from '@/pages/FranchisePage'
+import { OverAnalysisPage } from '@/pages/OverAnalysisPage'
+import { NotFoundPage } from '@/pages/NotFoundPage'
 import { CricketBallCursor } from '@/components/ui/cricket-ball-cursor'
 
 export default function App() {
@@ -42,6 +46,10 @@ export default function App() {
           <Route path="/venues" element={<VenuesPage />} />
           <Route path="/season/:year" element={<SeasonPage />} />
           <Route path="/season" element={<SeasonPage />} />
+          <Route path="/matchups" element={<MatchupExplorerPage />} />
+          <Route path="/franchises" element={<FranchisePage />} />
+          <Route path="/overs" element={<OverAnalysisPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
       <CricketBallCursor />

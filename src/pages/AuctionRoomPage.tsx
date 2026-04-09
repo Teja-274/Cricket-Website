@@ -19,9 +19,15 @@ export function AuctionRoomPage() {
     players,
     franchises,
     myFranchiseId,
+    currentBid,
     getCurrentPlayer,
     startAuction,
+    placeBid,
+    markSold,
+    markUnsold,
     isTimerRunning,
+    pauseTimer,
+    startTimer,
   } = useAuctionStore()
 
   const currentPlayer = getCurrentPlayer()
@@ -33,6 +39,29 @@ export function AuctionRoomPage() {
   useEffect(() => {
     if (!room) navigate('/lobby')
   }, [room, navigate])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    if (!room || room.status !== 'active') return
+    const handler = (e: KeyboardEvent) => {
+      // Ignore if typing in an input
+      if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') return
+
+      if (e.key === 'b' || e.key === 'B') {
+        if (myFranchiseId) placeBid(myFranchiseId)
+      } else if (e.key === 's' || e.key === 'S') {
+        if (currentBid > 0) markSold()
+      } else if (e.key === 'u' || e.key === 'U') {
+        markUnsold()
+      } else if (e.key === ' ') {
+        e.preventDefault()
+        if (isTimerRunning) pauseTimer()
+        else startTimer()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [room, myFranchiseId, currentBid, isTimerRunning, placeBid, markSold, markUnsold, pauseTimer, startTimer])
 
   if (!room) return null
 

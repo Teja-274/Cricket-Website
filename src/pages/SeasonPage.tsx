@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Calendar, Loader2 } from 'lucide-react'
+import { Calendar, Loader2, Trophy } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { NumberTicker } from '@/components/magicui/number-ticker'
 import { BorderBeam } from '@/components/magicui/border-beam'
-import { getAllSeasons, getSeasonLeaderboard } from '@/lib/queries'
+import { SparklesText } from '@/components/magicui/sparkles-text'
+import { getAllSeasons, getSeasonLeaderboard, getSeasonChampion } from '@/lib/queries'
 
 export function SeasonPage() {
   const { year } = useParams()
@@ -13,6 +14,7 @@ export function SeasonPage() {
   const [seasons, setSeasons] = useState<any[]>([])
   const [selectedYear, setSelectedYear] = useState<number>(year ? parseInt(year) : 2024)
   const [data, setData] = useState<any>(null)
+  const [champion, setChampion] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -22,7 +24,15 @@ export function SeasonPage() {
   useEffect(() => {
     if (!selectedYear) return
     setLoading(true)
-    getSeasonLeaderboard(selectedYear).then(d => { setData(d); setLoading(false) })
+    setChampion(null)
+    Promise.all([
+      getSeasonLeaderboard(selectedYear),
+      getSeasonChampion(selectedYear),
+    ]).then(([d, c]) => {
+      setData(d)
+      setChampion(c)
+      setLoading(false)
+    })
   }, [selectedYear])
 
   const orangeCap = data?.batsmen?.[0]
@@ -50,6 +60,25 @@ export function SeasonPage() {
           </div>
         ) : data ? (
           <>
+            {/* Champion */}
+            {champion && (
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                className="relative bg-gradient-to-r from-yellow-500/15 via-card/80 to-yellow-500/15 backdrop-blur-sm rounded-2xl border border-yellow-500/30 p-6 mb-8 overflow-hidden text-center">
+                <BorderBeam size={300} duration={6} colorFrom="#eab308" colorTo="#f59e0b" />
+                <Trophy className="w-10 h-10 text-yellow-400 mx-auto mb-2" />
+                <div className="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-2">IPL {selectedYear} CHAMPIONS</div>
+                <SparklesText className="text-4xl font-bold" sparklesCount={6} colors={{ first: '#eab308', second: '#f59e0b' }}>
+                  {champion.champion}
+                </SparklesText>
+                <div className="text-sm text-muted-foreground mt-3">
+                  Defeated <span className="font-semibold text-foreground">{champion.runnerUp}</span> in the Final
+                  {champion.winByRuns ? ` by ${champion.winByRuns} runs` : ''}
+                  {champion.winByWickets ? ` by ${champion.winByWickets} wickets` : ''}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">{champion.finalDate}</div>
+              </motion.div>
+            )}
+
             {/* Orange & Purple Cap */}
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               {orangeCap && (

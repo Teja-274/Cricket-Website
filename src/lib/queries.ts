@@ -355,6 +355,24 @@ export async function getSeasonLeaderboard(seasonYear: number) {
 }
 
 // ============================================================
+// SEASON CHAMPION
+// ============================================================
+
+export async function getSeasonChampion(seasonYear: number) {
+  if (!supabase) return null
+  const { data, error } = await supabase.rpc('get_season_champion', { season_yr: seasonYear })
+  if (error || !data || (data as any[]).length === 0) return null
+  const r = (data as any[])[0]
+  return {
+    champion: r.champion,
+    runnerUp: r.runner_up,
+    finalDate: r.final_date,
+    winByRuns: r.win_by_runs,
+    winByWickets: r.win_by_wickets,
+  }
+}
+
+// ============================================================
 // DISMISSAL STATS
 // ============================================================
 

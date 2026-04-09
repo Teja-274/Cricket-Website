@@ -252,55 +252,37 @@ export async function getAllVenues() {
 export async function getVenueStats(venueId: number) {
   if (!supabase) return null
 
-  const { data: matches } = await supabase
-    .from('matches')
-    .select('id, date, team1_id, team2_id, winner_id, toss_winner_id, toss_decision, team1_score, team1_wickets, team2_score, team2_wickets, teams!matches_team1_id_fkey(name, short_name), season_id')
-    .eq('venue_id', venueId)
+  // Use RPC for accurate aggregation
+  const [statsResult, scorersResult] = await Promise.all([
+    supabase.rpc('get_venue_stats', { v_id: venueId }),
+    supabase.rpc('get_venue_top_scorers', { v_id: venueId, lim: 10 }),
+  ])
 
-  if (!matches || matches.length === 0) return null
-
-  const totalMatches = matches.length
-  let totalFirstInningsScore = 0, totalSecondInningsScore = 0, firstInningsCount = 0, secondInningsCount = 0
-  let batFirstWins = 0, fieldFirstWins = 0
-
-  for (const m of matches as any[]) {
-    if (m.team1_score) { totalFirstInningsScore += m.team1_score; firstInningsCount++ }
-    if (m.team2_score) { totalSecondInningsScore += m.team2_score; secondInningsCount++ }
-    if (m.winner_id && m.toss_winner_id && m.toss_decision) {
-      if (m.toss_decision === 'bat' && m.winner_id === m.toss_winner_id) batFirstWins++
-      if (m.toss_decision === 'field' && m.winner_id === m.toss_winner_id) fieldFirstWins++
-    }
+  if (statsResult.error || !statsResult.data || (statsResult.data as any[]).length === 0) {
+    console.error('[Queries] get_venue_stats error:', statsResult.error)
+    return null
   }
 
-  // Top scorers at venue
-  const { data: topScorers } = await supabase
-    .from('player_match_stats')
-    .select('player_id, runs_scored, balls_faced, players!inner(name)')
-    .in('match_id', matches.map(m => m.id))
-    .gt('runs_scored', 0)
-    .order('runs_scored', { ascending: false })
-    .limit(100)
+  const s = (statsResult.data as any[])[0]
+  const totalMatches = Number(s.total_matches)
+  const batFirstWins = Number(s.bat_first_wins)
+  const fieldFirstWins = Number(s.field_first_wins)
 
-  const scorerMap = new Map<string, { name: string; runs: number; balls: number; matches: number }>()
-  if (topScorers) {
-    for (const row of topScorers as any[]) {
-      const pid = row.player_id
-      if (!scorerMap.has(pid)) scorerMap.set(pid, { name: row.players.name, runs: 0, balls: 0, matches: 0 })
-      const p = scorerMap.get(pid)!
-      p.runs += row.runs_scored
-      p.balls += row.balls_faced
-      p.matches += 1
-    }
-  }
+  const topScorers = (scorersResult.data as any[] || []).map((r: any) => ({
+    name: r.player_name,
+    runs: Number(r.total_runs),
+    balls: Number(r.total_balls),
+    matches: Number(r.match_count),
+  }))
 
   return {
     totalMatches,
-    avgFirstInnings: firstInningsCount > 0 ? Math.round(totalFirstInningsScore / firstInningsCount) : 0,
-    avgSecondInnings: secondInningsCount > 0 ? Math.round(totalSecondInningsScore / secondInningsCount) : 0,
-    highestScore: Math.max(...matches.map((m: any) => Math.max(m.team1_score || 0, m.team2_score || 0))),
+    avgFirstInnings: Number(s.avg_first_innings) || 0,
+    avgSecondInnings: Number(s.avg_second_innings) || 0,
+    highestScore: Number(s.highest_score) || 0,
     batFirstWinPct: totalMatches > 0 ? Math.round((batFirstWins / totalMatches) * 100) : 0,
     fieldFirstWinPct: totalMatches > 0 ? Math.round((fieldFirstWins / totalMatches) * 100) : 0,
-    topScorers: [...scorerMap.values()].sort((a, b) => b.runs - a.runs).slice(0, 10),
+    topScorers,
   }
 }
 

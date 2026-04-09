@@ -30,84 +30,51 @@ export async function getTopRunScorers(limit = 20) {
   return data || []
 }
 
-// Simple aggregation queries that work without RPCs
+// Uses RPC functions for accurate aggregation (no row limit issues)
 export async function getTopBatsmen(limit = 20) {
   if (!supabase) return []
-  const { data } = await supabase
-    .from('player_match_stats')
-    .select('player_id, match_id, runs_scored, balls_faced, fours, sixes, is_not_out, players!inner(name)')
-    .gt('balls_faced', 0)
-    .range(0, 50000)
-  if (!data) return []
-
-  const map = new Map<string, { id: string; name: string; runs: number; balls: number; matches: Set<string>; fours: number; sixes: number; not_outs: number; innings: number }>()
-  for (const row of data as any[]) {
-    const pid = row.player_id
-    if (!map.has(pid)) map.set(pid, { id: pid, name: row.players.name, runs: 0, balls: 0, matches: new Set(), fours: 0, sixes: 0, not_outs: 0, innings: 0 })
-    const p = map.get(pid)!
-    p.runs += row.runs_scored
-    p.balls += row.balls_faced
-    p.matches.add(row.match_id)
-    p.fours += row.fours
-    p.sixes += row.sixes
-    p.innings += 1
-    if (row.is_not_out) p.not_outs += 1
+  const { data, error } = await supabase.rpc('get_top_batsmen', { lim: limit })
+  if (error || !data) {
+    console.error('[Queries] get_top_batsmen error:', error)
+    return []
   }
-
-  return [...map.values()]
-    .map(p => ({
-      id: p.id,
-      name: p.name,
-      matches: p.matches.size,
-      innings: p.innings,
-      runs: p.runs,
-      balls: p.balls,
-      avg: p.innings - p.not_outs > 0 ? Math.round((p.runs / (p.innings - p.not_outs)) * 100) / 100 : 0,
-      sr: p.balls > 0 ? Math.round((p.runs / p.balls) * 10000) / 100 : 0,
-      fours: p.fours,
-      sixes: p.sixes,
-    }))
-    .sort((a, b) => b.runs - a.runs)
-    .slice(0, limit)
+  return (data as any[]).map(r => ({
+    id: r.player_id,
+    name: r.player_name,
+    matches: Number(r.matches),
+    innings: Number(r.innings),
+    runs: Number(r.runs),
+    balls: Number(r.balls),
+    fours: Number(r.fours),
+    sixes: Number(r.sixes),
+    avg: (Number(r.innings) - Number(r.not_outs)) > 0
+      ? Math.round((Number(r.runs) / (Number(r.innings) - Number(r.not_outs))) * 100) / 100 : 0,
+    sr: Number(r.balls) > 0
+      ? Math.round((Number(r.runs) / Number(r.balls)) * 10000) / 100 : 0,
+  }))
 }
 
 export async function getTopBowlers(limit = 20) {
   if (!supabase) return []
-  const { data } = await supabase
-    .from('player_match_stats')
-    .select('player_id, match_id, wickets_taken, runs_conceded, overs_bowled, dots_bowled, players!inner(name)')
-    .gt('overs_bowled', 0)
-    .range(0, 50000)
-  if (!data) return []
-
-  const map = new Map<string, { id: string; name: string; wickets: number; runs: number; overs: number; dots: number; matches: Set<string>; innings: number }>()
-  for (const row of data as any[]) {
-    const pid = row.player_id
-    if (!map.has(pid)) map.set(pid, { id: pid, name: row.players.name, wickets: 0, runs: 0, overs: 0, dots: 0, matches: new Set(), innings: 0 })
-    const p = map.get(pid)!
-    p.wickets += row.wickets_taken
-    p.runs += row.runs_conceded
-    p.overs += row.overs_bowled
-    p.dots += row.dots_bowled
-    p.matches.add(row.match_id)
-    p.innings += 1
+  const { data, error } = await supabase.rpc('get_top_bowlers', { lim: limit })
+  if (error || !data) {
+    console.error('[Queries] get_top_bowlers error:', error)
+    return []
   }
-
-  return [...map.values()]
-    .map(p => ({
-      id: p.id,
-      name: p.name,
-      matches: p.matches.size,
-      innings: p.innings,
-      wickets: p.wickets,
-      runs: p.runs,
-      overs: Math.round(p.overs * 10) / 10,
-      economy: p.overs > 0 ? Math.round((p.runs / p.overs) * 100) / 100 : 0,
-      avg: p.wickets > 0 ? Math.round((p.runs / p.wickets) * 100) / 100 : 0,
-      dots: p.dots,
-    }))
-    .sort((a, b) => b.wickets - a.wickets)
-    .slice(0, limit)
+  return (data as any[]).map(r => ({
+    id: r.player_id,
+    name: r.player_name,
+    matches: Number(r.matches),
+    innings: Number(r.innings),
+    wickets: Number(r.wickets),
+    runs: Number(r.runs_conceded),
+    overs: Math.round(Number(r.overs) * 10) / 10,
+    economy: Number(r.overs) > 0
+      ? Math.round((Number(r.runs_conceded) / Number(r.overs)) * 100) / 100 : 0,
+    avg: Number(r.wickets) > 0
+      ? Math.round((Number(r.runs_conceded) / Number(r.wickets)) * 100) / 100 : 0,
+    dots: Number(r.dots),
+  }))
 }
 
 // ============================================================

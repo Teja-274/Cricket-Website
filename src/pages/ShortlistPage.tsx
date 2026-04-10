@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, Trash2, Download, Brain, User, X, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Star, Trash2, Download, Brain, User, X, CheckCircle2, AlertCircle, Sparkles, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { NumberTicker } from '@/components/magicui/number-ticker'
+import { BorderBeam } from '@/components/magicui/border-beam'
 import { useAppStore } from '@/store/appStore'
+import { askGrok, SQUAD_ANALYZER_SYSTEM_PROMPT, isGrokConfigured } from '@/lib/grok'
+import { toast } from 'sonner'
 
 const roleColors: Record<string, string> = {
   'Batsman': 'bg-blue-500/20 text-blue-400',
@@ -21,8 +25,28 @@ const tierBorder: Record<string, string> = {
 
 export function ShortlistPage() {
   const { shortlist, removeFromShortlist, clearShortlist } = useAppStore()
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
   const roleCounts = shortlist.reduce((acc, p) => { acc[p.role] = (acc[p.role] || 0) + 1; return acc }, {} as Record<string, number>)
   const totalBase = shortlist.reduce((sum, p) => sum + p.basePriceCr, 0)
+
+  const handleAiAnalysis = async () => {
+    if (shortlist.length === 0) {
+      toast.error('Add players to your shortlist first')
+      return
+    }
+    setAnalyzing(true)
+    const prompt = `Analyze this IPL shortlist:\n\n${shortlist.map(p => `- ${p.name} (${p.role}, ${p.tier}, Base: ${p.basePriceCr} Cr)`).join('\n')}\n\nTotal base value: ${totalBase.toFixed(1)} Cr. ${shortlist.length} players.`
+    try {
+      const result = await askGrok(prompt, SQUAD_ANALYZER_SYSTEM_PROMPT)
+      setAiAnalysis(result)
+      toast.success('AI analysis complete')
+    } catch {
+      toast.error('Analysis failed')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   const exportCSV = () => {
     const csv = [['Name', 'Role', 'State', 'IPL Team', 'Base Price (Cr)', 'Tier', 'Capped'], ...shortlist.map(p => [p.name, p.role, p.state, p.iplTeam, p.basePriceCr, p.tier, p.isCapped ? 'Yes' : 'No'])].map(r => r.join(',')).join('\n')
@@ -49,11 +73,34 @@ export function ShortlistPage() {
           </div>
           {shortlist.length > 0 && (
             <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleAiAnalysis} disabled={analyzing} className="rounded-xl">
+                {analyzing ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1.5 text-primary" />}
+                AI Analyze
+              </Button>
               <Button variant="outline" size="sm" onClick={exportCSV} className="rounded-xl"><Download className="w-4 h-4 mr-1.5" />Export CSV</Button>
               <Button variant="outline" size="sm" onClick={clearShortlist} className="rounded-xl text-destructive hover:text-destructive"><Trash2 className="w-4 h-4 mr-1.5" />Clear</Button>
             </div>
           )}
         </div>
+
+        {/* AI Analysis */}
+        <AnimatePresence>
+          {aiAnalysis && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }}
+              className="relative bg-gradient-to-br from-primary/10 via-card/80 to-chart-3/10 backdrop-blur-sm rounded-2xl border border-primary/20 p-6 mb-6 overflow-hidden">
+              <BorderBeam size={200} duration={8} colorFrom="#f5a623" colorTo="#3b82f6" />
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-bold uppercase tracking-wider text-primary" style={{ fontFamily: 'var(--font-heading)' }}>AI SQUAD ANALYSIS</h3>
+                {!isGrokConfigured() && <Badge variant="outline" className="text-[10px]">Mock Mode</Badge>}
+                <button onClick={() => setAiAnalysis(null)} className="ml-auto text-muted-foreground hover:text-foreground">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{aiAnalysis}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {shortlist.length > 0 && (
           <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 p-6 mb-6">

@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Trophy, ArrowLeft, IndianRupee, Users, TrendingUp, BarChart3 } from 'lucide-react'
+import { Trophy, ArrowLeft, IndianRupee, Users, TrendingUp, BarChart3, Download, Film } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { NumberTicker } from '@/components/magicui/number-ticker'
 import { useAuctionStore } from '@/store/auctionStore'
+import { exportAuctionResultsPDF } from '@/lib/pdfExport'
 
 export function AuctionResultsPage() {
   const navigate = useNavigate()
@@ -44,11 +45,21 @@ export function AuctionResultsPage() {
           <ArrowLeft className="w-4 h-4 mr-2" />Back
         </Button>
 
-        <div className="mb-8">
+        <div className="mb-8 flex items-start justify-between">
+          <div>
           <h1 className="text-4xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
             <Trophy className="inline-block w-8 h-8 text-primary mr-3 -mt-1" />AUCTION RESULTS
           </h1>
           <p className="text-muted-foreground mt-1">{room.name} | {soldPlayers.length} sold | {unsoldPlayers.length} unsold | {bids.length} total bids</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate('/replay')} className="rounded-xl">
+              <Film className="w-4 h-4 mr-1.5" />Replay
+            </Button>
+            <Button size="sm" onClick={() => exportAuctionResultsPDF(room, franchises, players)} className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+              <Download className="w-4 h-4 mr-1.5" />Export PDF
+            </Button>
+          </div>
         </div>
 
         {/* Summary cards */}

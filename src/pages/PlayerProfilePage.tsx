@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, User, Star, GitCompareArrows, Trophy, TrendingUp, MapPin, Loader2, Swords, Target } from 'lucide-react'
+import { ArrowLeft, User, Star, GitCompareArrows, Trophy, TrendingUp, MapPin, Loader2, Swords, Target, Sparkles, IndianRupee, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
@@ -17,7 +17,9 @@ import {
   getPlayerVenuePerformance, getPlayerBattingMatchups, getPlayerBowlingMatchups,
   getPlayerDismissals,
 } from '@/lib/queries'
+import { askGrok, PRICE_PREDICTOR_SYSTEM_PROMPT, isGrokConfigured } from '@/lib/grok'
 import { useAppStore } from '@/store/appStore'
+import { toast } from 'sonner'
 
 export function PlayerProfilePage() {
   const { id } = useParams()
@@ -32,6 +34,23 @@ export function PlayerProfilePage() {
   const [bowlingMatchups, setBowlingMatchups] = useState<any[]>([])
   const [dismissals, setDismissals] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [pricePrediction, setPricePrediction] = useState<string | null>(null)
+  const [predicting, setPredicting] = useState(false)
+
+  const handlePredictPrice = async () => {
+    if (!player || !career) return
+    setPredicting(true)
+    const prompt = `Player: ${player.name}\nRole: ${player.role || 'Batsman'}\nBatting: ${player.batting_style || '—'}\nBowling: ${player.bowling_style || 'None'}\n\nCareer stats (IPL):\n- Matches: ${career.matches}\n- Runs: ${career.runs} @ Avg ${career.avg}, SR ${career.sr}\n- Wickets: ${career.wickets} @ Econ ${career.economy}\n- 6s: ${career.sixes}, Highest: ${career.highestScore}\n\nPredict auction price for IPL 2026.`
+    try {
+      const result = await askGrok(prompt, PRICE_PREDICTOR_SYSTEM_PROMPT)
+      setPricePrediction(result)
+      toast.success('Price prediction ready')
+    } catch {
+      toast.error('Prediction failed')
+    } finally {
+      setPredicting(false)
+    }
+  }
 
   useEffect(() => {
     if (!id) return
@@ -186,6 +205,7 @@ export function PlayerProfilePage() {
             <TabsTrigger value="venues" className="rounded-lg">Venues</TabsTrigger>
             <TabsTrigger value="matchups" className="rounded-lg">Matchups</TabsTrigger>
             <TabsTrigger value="dismissals" className="rounded-lg">Dismissals</TabsTrigger>
+            <TabsTrigger value="ai-price" className="rounded-lg">AI Price</TabsTrigger>
           </TabsList>
 
           {/* Overview */}
@@ -345,6 +365,38 @@ export function PlayerProfilePage() {
                 </div>
               </div>
             )}
+          </TabsContent>
+
+          {/* AI Price Predictor */}
+          <TabsContent value="ai-price" className="mt-6">
+            <Card className="relative bg-gradient-to-br from-primary/10 via-card/80 to-chart-3/10 border-primary/20 overflow-hidden">
+              <BorderBeam size={200} duration={8} colorFrom="#f5a623" colorTo="#3b82f6" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                  <Sparkles className="w-4 h-4 text-primary" />AI AUCTION PRICE PREDICTION
+                  {!isGrokConfigured() && <Badge variant="outline" className="text-[10px] ml-2">Mock Mode</Badge>}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!pricePrediction ? (
+                  <div className="text-center py-8">
+                    <IndianRupee className="w-12 h-12 text-primary/20 mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground mb-4">Get an AI-powered auction price prediction for {player.name} based on career stats.</p>
+                    <Button onClick={handlePredictPrice} disabled={predicting} className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+                      {predicting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                      Predict Price
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="py-4">
+                    <pre className="text-sm font-sans whitespace-pre-wrap leading-relaxed">{pricePrediction}</pre>
+                    <Button onClick={() => setPricePrediction(null)} variant="outline" size="sm" className="mt-4">
+                      <X className="w-3 h-3 mr-1" />Clear
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Dismissals */}

@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { Search, Filter, X, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Search, Filter, X, SlidersHorizontal, ArrowUpDown, Sparkles, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PlayerCard } from '@/components/scout/PlayerCard'
 import { PLAYERS, type PlayerRole, type PlayerTier } from '@/data/players'
+import { askGrok, SEARCH_SYSTEM_PROMPT, isGrokConfigured } from '@/lib/grok'
+import { toast } from 'sonner'
 
 const roles: PlayerRole[] = ['Batsman', 'Bowler', 'All-Rounder', 'WK-Batsman']
 const tiers: PlayerTier[] = ['International Ready', 'IPL Proven', 'Domestic Star', 'Emerging Talent']
@@ -27,6 +29,31 @@ export function ScoutPage() {
   const [cappedOnly, setCappedOnly] = useState(false)
   const [showFilters, setShowFilters] = useState(true)
   const [sortBy, setSortBy] = useState('name')
+  const [aiQuery, setAiQuery] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiResults, setAiResults] = useState<string[] | null>(null)
+
+  const handleAiSearch = async () => {
+    if (!aiQuery.trim()) return
+    setAiLoading(true)
+    setAiResults(null)
+    try {
+      const response = await askGrok(aiQuery, SEARCH_SYSTEM_PROMPT)
+      // Parse JSON array from response
+      const match = response.match(/\[[\s\S]*\]/)
+      if (match) {
+        const names = JSON.parse(match[0]) as string[]
+        setAiResults(names)
+        toast.success(`AI found ${names.length} matching players`)
+      } else {
+        toast.error('AI returned an unexpected response')
+      }
+    } catch (err) {
+      toast.error('AI search failed')
+    } finally {
+      setAiLoading(false)
+    }
+  }
 
   const toggle = (set: Set<string>, val: string) => { const n = new Set(set); if (n.has(val)) n.delete(val); else n.add(val); return n }
   const filterCount = selectedRoles.size + selectedTiers.size + selectedBatting.size + selectedStates.size + (cappedOnly ? 1 : 0)
@@ -71,11 +98,46 @@ export function ScoutPage() {
           </Button>
         </div>
 
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, role, state, team, bowling style..."
             className="pl-12 py-6 text-base bg-card/80 backdrop-blur-sm border-border/50 rounded-xl" />
           {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>}
+        </div>
+
+        {/* AI Search */}
+        <div className="relative mb-6 bg-gradient-to-r from-primary/10 via-card/80 to-chart-3/10 rounded-xl border border-primary/20 p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-xs font-bold uppercase tracking-wider text-primary">AI SEARCH (Powered by Grok)</span>
+            {!isGrokConfigured() && <Badge variant="outline" className="text-[10px]">Mock Mode</Badge>}
+          </div>
+          <div className="flex gap-2">
+            <Input value={aiQuery} onChange={(e) => setAiQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAiSearch()}
+              placeholder="e.g. young left-arm spinner who bowls well in death overs"
+              className="flex-1 bg-background/50 border-border/50 rounded-lg" />
+            <Button onClick={handleAiSearch} disabled={aiLoading || !aiQuery.trim()} className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
+              {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            </Button>
+          </div>
+          <AnimatePresence>
+            {aiResults && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                className="mt-3 flex flex-wrap gap-2">
+                <span className="text-xs text-muted-foreground">AI suggests:</span>
+                {aiResults.map((name, i) => (
+                  <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10"
+                    onClick={() => { setSearch(name); setAiResults(null) }}>
+                    {name}
+                  </Badge>
+                ))}
+                <button onClick={() => setAiResults(null)} className="text-xs text-muted-foreground hover:text-foreground ml-auto">
+                  <X className="w-3 h-3" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {showFilters && (

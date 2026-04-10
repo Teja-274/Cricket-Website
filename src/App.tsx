@@ -20,6 +20,7 @@ import { MatchupExplorerPage } from '@/pages/MatchupExplorerPage'
 import { FranchisePage } from '@/pages/FranchisePage'
 import { OverAnalysisPage } from '@/pages/OverAnalysisPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
+import { AuctionReplayPage } from '@/pages/AuctionReplayPage'
 import { CricketBallCursor } from '@/components/ui/cricket-ball-cursor'
 
 export default function App() {
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/matchups" element={<MatchupExplorerPage />} />
           <Route path="/franchises" element={<FranchisePage />} />
           <Route path="/overs" element={<OverAnalysisPage />} />
+          <Route path="/replay" element={<AuctionReplayPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

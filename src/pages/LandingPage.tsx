@@ -10,7 +10,7 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button'
 import { Marquee } from '@/components/magicui/marquee'
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { TextAnimate } from '@/components/magicui/text-animate'
-import CrystalCursor from '@/components/ui/crystal-cursor'
+
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -54,10 +54,6 @@ export function LandingPage() {
   const navigate = useNavigate()
 
   return (
-    <CrystalCursor
-      backgroundOnly
-      className="min-h-screen"
-    >
     <div className="min-h-screen overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center px-8">
@@ -386,6 +382,5 @@ export function LandingPage() {
         </motion.div>
       </section>
     </div>
-    </CrystalCursor>
   )
 }

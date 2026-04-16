@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { StarsBackground } from '@/components/ui/stars'
 import { Trophy, Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -37,7 +38,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-background relative overflow-hidden">
+    <StarsBackground className="min-h-screen flex items-center justify-center p-6 bg-background" starColor="rgba(245, 166, 35, 0.5)" speed={60}>
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -148,6 +149,6 @@ export function LoginPage() {
           </Button>
         </div>
       </motion.div>
-    </div>
+    </StarsBackground>
   )
 }

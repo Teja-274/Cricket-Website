@@ -64,10 +64,10 @@ export function SeasonPage() {
             {champion && (
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                 className="relative bg-gradient-to-r from-yellow-500/15 via-card/80 to-yellow-500/15 backdrop-blur-sm rounded-2xl border border-yellow-500/30 p-6 mb-8 overflow-hidden text-center">
-                <BorderBeam size={300} duration={6} colorFrom="#eab308" colorTo="#f59e0b" />
+                <BorderBeam size={300} duration={6} colorFrom="#eab308" colorTo="#c0c8d4" />
                 <Trophy className="w-10 h-10 text-yellow-400 mx-auto mb-2" />
                 <div className="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-2">IPL {selectedYear} CHAMPIONS</div>
-                <SparklesText className="text-4xl font-bold" sparklesCount={6} colors={{ first: '#eab308', second: '#f59e0b' }}>
+                <SparklesText className="text-4xl font-bold" sparklesCount={6} colors={{ first: '#eab308', second: '#c0c8d4' }}>
                   {champion.champion}
                 </SparklesText>
                 <div className="text-sm text-muted-foreground mt-3">
@@ -84,7 +84,7 @@ export function SeasonPage() {
               {orangeCap && (
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                   className="relative bg-gradient-to-br from-amber-500/10 to-card/80 backdrop-blur-sm rounded-2xl border border-amber-500/30 p-6 overflow-hidden">
-                  <BorderBeam size={150} duration={6} colorFrom="#f59e0b" colorTo="#eab308" />
+                  <BorderBeam size={150} duration={6} colorFrom="#c0c8d4" colorTo="#eab308" />
                   <div className="flex items-center gap-2 mb-2">
                     <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">🧡 ORANGE CAP</Badge>
                   </div>

@@ -16,7 +16,7 @@ function getBidIncrement(currentBid: number): number {
 }
 
 function fireConfetti(color: string) {
-  const colors = [color, '#f59e0b', '#22c55e']
+  const colors = [color, '#c0c8d4', '#22c55e']
   confetti({
     particleCount: 100,
     spread: 70,
@@ -79,7 +79,7 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
   }
 
   const handleSold = () => {
-    const bidderColor = currentBidder?.color || '#f59e0b'
+    const bidderColor = currentBidder?.color || '#c0c8d4'
     fireConfetti(bidderColor)
     playSound('sold')
     playSound('crowd')
@@ -126,7 +126,7 @@ export function BidControls({ isAdmin }: { isAdmin: boolean }) {
         {isUrgent && canBid ? (
           <PulsatingButton
             onClick={handleBid}
-            pulseColor="#f59e0b"
+            pulseColor="#c0c8d4"
             className="w-full py-8 text-xl font-bold rounded-xl bg-primary text-primary-foreground"
             style={{ fontFamily: 'var(--font-heading)' }}
           >

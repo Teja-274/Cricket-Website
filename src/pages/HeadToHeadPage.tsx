@@ -98,7 +98,7 @@ export function HeadToHeadPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Player 1 batting vs Player 2 */}
               <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 p-6 overflow-hidden">
-                <BorderBeam size={150} duration={8} colorFrom="#f5a623" colorTo="#22c55e" />
+                <BorderBeam size={150} duration={8} colorFrom="#c0c8d4" colorTo="#22c55e" />
                 <h3 className="text-xs font-bold uppercase text-muted-foreground mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
                   {player1.name} BATTING vs {player2.name.split(' ').pop()}
                 </h3>

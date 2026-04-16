@@ -34,7 +34,7 @@ export function AnalyticsPage() {
     fetch()
   }, [])
 
-  const batConfig: ChartConfig = { runs: { label: 'Runs', color: '#f5a623' } }
+  const batConfig: ChartConfig = { runs: { label: 'Runs', color: '#c0c8d4' } }
   const bowlConfig: ChartConfig = { wickets: { label: 'Wickets', color: '#22c55e' } }
 
   return (
@@ -66,7 +66,7 @@ export function AnalyticsPage() {
                 ].map(s => (
                   <motion.div key={s.label} whileHover={{ scale: 1.03, y: -2 }}
                     className="relative p-5 rounded-xl bg-card/80 backdrop-blur-sm border border-border/50 overflow-hidden">
-                    <BorderBeam size={100} duration={10} colorFrom="#f5a623" colorTo="#22c55e" className="opacity-30" />
+                    <BorderBeam size={100} duration={10} colorFrom="#c0c8d4" colorTo="#22c55e" className="opacity-30" />
                     <s.icon className={`w-5 h-5 ${s.color} mb-2`} />
                     <div className={`text-3xl font-bold ${s.color}`} style={{ fontFamily: 'var(--font-heading)' }}>
                       <NumberTicker value={s.value} />
@@ -93,7 +93,7 @@ export function AnalyticsPage() {
                         <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
                         <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} width={95} />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="runs" fill="#f5a623" radius={[0, 4, 4, 0]} barSize={16}
+                        <Bar dataKey="runs" fill="#c0c8d4" radius={[0, 4, 4, 0]} barSize={16}
                           filter="url(#glow-a)" />
                         <defs>
                           <filter id="glow-a" x="-20%" y="-20%" width="140%" height="140%">

@@ -104,7 +104,7 @@ export function LandingPage() {
             <SparklesText
               className="text-6xl md:text-8xl font-bold tracking-tighter leading-none mb-6"
               sparklesCount={8}
-              colors={{ first: '#f59e0b', second: '#22c55e' }}
+              colors={{ first: '#c0c8d4', second: '#22c55e' }}
             >
               SCOUT INDIA
             </SparklesText>
@@ -128,9 +128,9 @@ export function LandingPage() {
             <ShimmerButton
               onClick={() => navigate('/lobby')}
               className="shadow-lg shadow-primary/25"
-              shimmerColor="#f59e0b"
+              shimmerColor="#c0c8d4"
               shimmerSize="0.1em"
-              background="rgba(245, 158, 11, 0.9)"
+              background="rgba(180, 190, 205, 0.85)"
             >
               <Gavel className="w-5 h-5 mr-2" />
               <span className="text-base font-semibold">Enter Auction</span>
@@ -293,7 +293,7 @@ export function LandingPage() {
                 <BorderBeam
                   size={200}
                   duration={8 + i * 2}
-                  colorFrom="#f59e0b"
+                  colorFrom="#c0c8d4"
                   colorTo="#22c55e"
                   className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 />
@@ -353,7 +353,7 @@ export function LandingPage() {
           viewport={{ once: true }}
           className="relative max-w-3xl mx-auto text-center bg-gradient-to-br from-primary/10 via-card to-chart-3/10 rounded-3xl p-12 border border-primary/20 overflow-hidden"
         >
-          <BorderBeam size={300} duration={10} colorFrom="#f59e0b" colorTo="#3b82f6" />
+          <BorderBeam size={300} duration={10} colorFrom="#c0c8d4" colorTo="#3b82f6" />
           <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
             READY TO BUILD YOUR <span className="text-primary">DREAM XI</span>?
@@ -364,8 +364,8 @@ export function LandingPage() {
           <div className="flex items-center justify-center gap-4">
             <ShimmerButton
               onClick={() => navigate('/lobby')}
-              shimmerColor="#f59e0b"
-              background="rgba(245, 158, 11, 0.9)"
+              shimmerColor="#c0c8d4"
+              background="rgba(180, 190, 205, 0.85)"
             >
               <Users className="w-5 h-5 mr-2" />
               <span className="font-semibold">Create Auction Room</span>

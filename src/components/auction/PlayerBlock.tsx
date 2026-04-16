@@ -33,7 +33,7 @@ export function PlayerBlock({ player, isActive }: { player: Player; isActive: bo
         style={{ backgroundImage: 'linear-gradient(to bottom, rgba(10,40,20,0.08), transparent 40%)' }}
       >
         {/* Animated border beam when active */}
-        {isActive && <BorderBeam size={250} duration={6} colorFrom="#f5a623" colorTo="#22c55e" />}
+        {isActive && <BorderBeam size={250} duration={6} colorFrom="#c0c8d4" colorTo="#22c55e" />}
         {/* Floodlight top glow */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
         {/* Pitch green bottom accent */}

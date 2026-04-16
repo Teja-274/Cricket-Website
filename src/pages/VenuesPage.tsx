@@ -63,7 +63,7 @@ export function VenuesPage() {
               {selectedVenue ? (
                 <motion.div key={selectedVenue.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
                   className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden">
-                  <BorderBeam size={200} duration={10} colorFrom="#f5a623" colorTo="#22c55e" />
+                  <BorderBeam size={200} duration={10} colorFrom="#c0c8d4" colorTo="#22c55e" />
 
                   <div className="p-6 border-b border-border/30" style={{ background: 'linear-gradient(135deg, rgba(245,166,35,0.05), transparent)' }}>
                     <Button variant="ghost" size="sm" onClick={() => { setSelectedVenue(null); setVenueStats(null) }} className="lg:hidden mb-2">

@@ -38,7 +38,7 @@ export function LoginPage() {
   }
 
   return (
-    <StarsBackground className="min-h-screen flex items-center justify-center p-6 bg-background" starColor="rgba(245, 166, 35, 0.5)" speed={60}>
+    <StarsBackground className="min-h-screen flex items-center justify-center p-6 bg-background" starColor="rgba(255, 255, 255, 0.8)" speed={60}>
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -54,7 +54,7 @@ export function LoginPage() {
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
             <Trophy className="w-8 h-8 text-primary" />
           </motion.div>
-          <SparklesText className="text-3xl font-bold" sparklesCount={5} colors={{ first: '#f59e0b', second: '#22c55e' }}>
+          <SparklesText className="text-3xl font-bold" sparklesCount={5} colors={{ first: '#c0c8d4', second: '#22c55e' }}>
             SCOUT INDIA
           </SparklesText>
           <p className="text-sm text-muted-foreground mt-1">IPL Auction Strategy Platform</p>
@@ -62,7 +62,7 @@ export function LoginPage() {
 
         {/* Auth card */}
         <div className="relative bg-card/80 backdrop-blur-xl rounded-2xl border border-border/50 p-6 overflow-hidden">
-          <BorderBeam size={200} duration={8} colorFrom="#f59e0b" colorTo="#22c55e" />
+          <BorderBeam size={200} duration={8} colorFrom="#c0c8d4" colorTo="#22c55e" />
 
           <Tabs defaultValue="login">
             <TabsList className="w-full bg-background/50 rounded-xl mb-6">
@@ -97,7 +97,7 @@ export function LoginPage() {
                 </label>
                 <button className="text-primary hover:underline">Forgot password?</button>
               </div>
-              <ShimmerButton onClick={handleLogin} className="w-full" shimmerColor="#f59e0b" background="rgba(245, 158, 11, 0.9)"
+              <ShimmerButton onClick={handleLogin} className="w-full" shimmerColor="#c0c8d4" background="rgba(180, 190, 205, 0.85)"
                 disabled={loading}>
                 <span className="font-semibold">{loading ? 'Signing in...' : 'Sign In'}</span>
                 <ArrowRight className="w-4 h-4 ml-2" />

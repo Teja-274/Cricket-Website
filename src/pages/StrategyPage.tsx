@@ -202,7 +202,7 @@ export function StrategyPage() {
           {/* Sidebar analysis */}
           <div className="space-y-4">
             <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 p-5 overflow-hidden">
-              <BorderBeam size={150} duration={8} colorFrom="#f59e0b" colorTo="#22c55e" />
+              <BorderBeam size={150} duration={8} colorFrom="#c0c8d4" colorTo="#22c55e" />
               <div className="flex items-center gap-2 mb-4">
                 <Brain className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground" style={{ fontFamily: 'var(--font-heading)' }}>

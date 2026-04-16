@@ -88,7 +88,7 @@ export function ShortlistPage() {
           {aiAnalysis && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }}
               className="relative bg-gradient-to-br from-primary/10 via-card/80 to-chart-3/10 backdrop-blur-sm rounded-2xl border border-primary/20 p-6 mb-6 overflow-hidden">
-              <BorderBeam size={200} duration={8} colorFrom="#f5a623" colorTo="#3b82f6" />
+              <BorderBeam size={200} duration={8} colorFrom="#c0c8d4" colorTo="#3b82f6" />
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-primary" style={{ fontFamily: 'var(--font-heading)' }}>AI SQUAD ANALYSIS</h3>

@@ -23,7 +23,7 @@ export function Layout() {
   return (
     <StarsBackground
       className="min-h-screen bg-background"
-      starColor="rgba(245, 166, 35, 0.6)"
+      starColor="rgba(255, 255, 255, 0.8)"
       speed={80}
       factor={0.03}
     >

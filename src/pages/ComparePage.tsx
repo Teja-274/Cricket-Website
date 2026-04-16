@@ -114,7 +114,7 @@ function StatsRadarChart({ p1, p2, s1, s2 }: { p1: Player; p2: Player; s1: Recor
   if (radarData.length < 3) return null
 
   const chartConfig: ChartConfig = {
-    player1: { label: p1.name.split(' ').pop(), color: '#f59e0b' },
+    player1: { label: p1.name.split(' ').pop(), color: '#c0c8d4' },
     player2: { label: p2.name.split(' ').pop(), color: '#3b82f6' },
   }
 
@@ -132,7 +132,7 @@ function StatsRadarChart({ p1, p2, s1, s2 }: { p1: Player; p2: Player; s1: Recor
             <PolarGrid stroke="var(--border)" />
             <PolarAngleAxis dataKey="stat" tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} />
             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-            <Radar name={p1.name} dataKey="player1" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} strokeWidth={2} />
+            <Radar name={p1.name} dataKey="player1" stroke="#c0c8d4" fill="#c0c8d4" fillOpacity={0.2} strokeWidth={2} />
             <Radar name={p2.name} dataKey="player2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} strokeWidth={2} />
             <ChartTooltip content={<ChartTooltipContent />} />
           </RadarChart>
@@ -159,7 +159,7 @@ function StatsBarChart({ p1, p2, s1, s2 }: { p1: Player; p2: Player; s1: Record<
   if (barData.length === 0) return null
 
   const chartConfig: ChartConfig = {
-    player1: { label: p1.name.split(' ').pop(), color: '#f59e0b' },
+    player1: { label: p1.name.split(' ').pop(), color: '#c0c8d4' },
     player2: { label: p2.name.split(' ').pop(), color: '#3b82f6' },
   }
 
@@ -170,7 +170,7 @@ function StatsBarChart({ p1, p2, s1, s2 }: { p1: Player; p2: Player; s1: Record<
           <BarChart3 className="w-4 h-4 text-chart-2" />
           STAT COMPARISON
           <div className="flex items-center gap-3 ml-auto text-[10px] font-normal">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#f59e0b]" />{p1.name.split(' ').pop()}</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#c0c8d4]" />{p1.name.split(' ').pop()}</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#3b82f6]" />{p2.name.split(' ').pop()}</span>
           </div>
         </CardTitle>
@@ -182,7 +182,7 @@ function StatsBarChart({ p1, p2, s1, s2 }: { p1: Player; p2: Player; s1: Record<
             <XAxis dataKey="stat" tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 11 }} />
             <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="player1" fill="#f59e0b" radius={[4, 4, 0, 0]} barSize={20} filter="url(#bar-glow-1)" />
+            <Bar dataKey="player1" fill="#c0c8d4" radius={[4, 4, 0, 0]} barSize={20} filter="url(#bar-glow-1)" />
             <Bar dataKey="player2" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={20} filter="url(#bar-glow-2)" />
             <defs>
               <filter id="bar-glow-1" x="-20%" y="-20%" width="140%" height="140%">
@@ -227,7 +227,7 @@ export function ComparePage() {
             {p1 ? (
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                 className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 p-6 overflow-hidden">
-                <BorderBeam size={150} duration={8} colorFrom="#f59e0b" colorTo="#22c55e" />
+                <BorderBeam size={150} duration={8} colorFrom="#c0c8d4" colorTo="#22c55e" />
                 <button onClick={() => setCompareSlot(0, null)} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
                 <div className="text-center">
                   <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-3 ring-2 ring-amber-500/30">

@@ -76,9 +76,9 @@ export function PlayerProfilePage() {
   }, [id])
 
   const chartConfig: ChartConfig = {
-    runs: { label: 'Runs', color: '#f5a623' },
+    runs: { label: 'Runs', color: '#c0c8d4' },
     wickets: { label: 'Wickets', color: '#22c55e' },
-    value: { label: 'Value', color: '#f5a623' },
+    value: { label: 'Value', color: '#c0c8d4' },
   }
 
   if (loading) {
@@ -112,7 +112,7 @@ export function PlayerProfilePage() {
 
         {/* Hero */}
         <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden mb-6">
-          <BorderBeam size={300} duration={10} colorFrom="#f5a623" colorTo="#22c55e" />
+          <BorderBeam size={300} duration={10} colorFrom="#c0c8d4" colorTo="#22c55e" />
           <div className="p-6 lg:p-8">
             <div className="flex flex-col md:flex-row gap-6 items-start">
               <div className="w-24 h-24 rounded-2xl bg-accent/50 flex items-center justify-center ring-2 ring-border/30 shrink-0">
@@ -224,7 +224,7 @@ export function PlayerProfilePage() {
                       <XAxis dataKey="year" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
                       <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      {isBatsman && <Line type="monotone" dataKey="runs" stroke="#f5a623" strokeWidth={3} dot={{ fill: '#f5a623', r: 4 }} />}
+                      {isBatsman && <Line type="monotone" dataKey="runs" stroke="#c0c8d4" strokeWidth={3} dot={{ fill: '#c0c8d4', r: 4 }} />}
                       {isBowler && <Line type="monotone" dataKey="wickets" stroke="#22c55e" strokeWidth={3} dot={{ fill: '#22c55e', r: 4 }} />}
                     </LineChart>
                   </ChartContainer>
@@ -284,7 +284,7 @@ export function PlayerProfilePage() {
                       <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
                       <YAxis type="category" dataKey="venue" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} width={115} />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="runs" fill="#f5a623" radius={[0, 4, 4, 0]} barSize={14} />
+                      <Bar dataKey="runs" fill="#c0c8d4" radius={[0, 4, 4, 0]} barSize={14} />
                     </BarChart>
                   </ChartContainer>
                 </CardContent>
@@ -370,7 +370,7 @@ export function PlayerProfilePage() {
           {/* AI Price Predictor */}
           <TabsContent value="ai-price" className="mt-6">
             <Card className="relative bg-gradient-to-br from-primary/10 via-card/80 to-chart-3/10 border-primary/20 overflow-hidden">
-              <BorderBeam size={200} duration={8} colorFrom="#f5a623" colorTo="#3b82f6" />
+              <BorderBeam size={200} duration={8} colorFrom="#c0c8d4" colorTo="#3b82f6" />
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
                   <Sparkles className="w-4 h-4 text-primary" />AI AUCTION PRICE PREDICTION

@@ -32,7 +32,7 @@ export function OverAnalysisPage() {
   }, [selected])
 
   const chartConfig: ChartConfig = {
-    runsPerMatch: { label: 'Avg Runs', color: '#f5a623' },
+    runsPerMatch: { label: 'Avg Runs', color: '#c0c8d4' },
     wicketsLost: { label: 'Wickets', color: '#ef4444' },
   }
 

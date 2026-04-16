@@ -17,7 +17,7 @@ export function NotFoundPage() {
         >
           🏏
         </motion.div>
-        <SparklesText className="text-6xl md:text-8xl font-bold mb-4" sparklesCount={8} colors={{ first: '#f5a623', second: '#ef4444' }}>
+        <SparklesText className="text-6xl md:text-8xl font-bold mb-4" sparklesCount={8} colors={{ first: '#c0c8d4', second: '#ef4444' }}>
           BOWLED OUT!
         </SparklesText>
         <p className="text-xl text-muted-foreground mb-2 mt-4">404 — Page Not Found</p>

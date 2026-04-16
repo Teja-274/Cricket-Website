@@ -69,7 +69,7 @@ export function LobbyPage() {
           {step === 'create' ? (
             <motion.div key="create" initial={{ opacity: 0, x: -30, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -30, scale: 0.98 }} transition={{ duration: 0.4 }} className="grid lg:grid-cols-2 gap-6">
               <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 p-6 overflow-hidden">
-                <BorderBeam size={200} duration={8} colorFrom="#f59e0b" colorTo="#22c55e" />
+                <BorderBeam size={200} duration={8} colorFrom="#c0c8d4" colorTo="#22c55e" />
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><Plus className="w-5 h-5 text-primary" /></div>
                   <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>CREATE ROOM</h2>
@@ -102,7 +102,7 @@ export function LobbyPage() {
                       <Input type="number" value={timer} onChange={(e) => setTimer(Number(e.target.value))} className="mt-1.5 bg-background/50 border-border/50 h-11 rounded-xl" />
                     </div>
                   </div>
-                  <ShimmerButton onClick={handleCreateRoom} className="w-full" shimmerColor="#f59e0b" background="rgba(245, 158, 11, 0.9)">
+                  <ShimmerButton onClick={handleCreateRoom} className="w-full" shimmerColor="#c0c8d4" background="rgba(180, 190, 205, 0.85)">
                     <span className="text-base font-semibold">Next: Pick Franchise</span><ArrowRight className="w-5 h-5 ml-2" />
                   </ShimmerButton>
                 </div>
@@ -157,7 +157,7 @@ export function LobbyPage() {
                 ))}
               </div>
               <motion.div animate={{ opacity: selectedTeam ? 1 : 0.3 }} className="mt-8 flex justify-center">
-                <ShimmerButton onClick={handleStartAuction} disabled={!selectedTeam} shimmerColor="#f59e0b" background="rgba(245, 158, 11, 0.9)" className="px-12">
+                <ShimmerButton onClick={handleStartAuction} disabled={!selectedTeam} shimmerColor="#c0c8d4" background="rgba(180, 190, 205, 0.85)" className="px-12">
                   <Gavel className="w-6 h-6 mr-3" /><span className="text-lg font-bold">START AUCTION</span>
                 </ShimmerButton>
               </motion.div>

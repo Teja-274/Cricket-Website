@@ -21,7 +21,7 @@ import { FranchisePage } from '@/pages/FranchisePage'
 import { OverAnalysisPage } from '@/pages/OverAnalysisPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { AuctionReplayPage } from '@/pages/AuctionReplayPage'
-import { CricketBallCursor } from '@/components/ui/cricket-ball-cursor'
+import { SpiderCursor } from '@/components/ui/spider-cursor'
 
 export default function App() {
   return (
@@ -54,7 +54,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
-      <CricketBallCursor />
+      <SpiderCursor />
       <Toaster richColors position="bottom-right" theme="dark" />
     </BrowserRouter>
   )

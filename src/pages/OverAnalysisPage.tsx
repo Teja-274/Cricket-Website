@@ -112,6 +112,7 @@ function PlayerOverAnalysis() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any[]>([])
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null)
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null)
   const [batData, setBatData] = useState<any[]>([])
   const [bowlData, setBowlData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -126,16 +127,13 @@ function PlayerOverAnalysis() {
     setSearching(false)
   }
 
-  const handleSelect = async (player: any) => {
-    setSelectedPlayer(player)
-    setQuery(player.name)
-    setResults([])
-    if (!supabase) return
+  const fetchData = async (player: any, teamName: string | null) => {
+    if (!supabase || !player) return
     setLoading(true)
 
     const [batRes, bowlRes] = await Promise.all([
-      supabase.rpc('get_batter_over_stats', { p_id: player.id }),
-      supabase.rpc('get_bowler_over_stats', { p_id: player.id }),
+      supabase.rpc('get_batter_over_stats_by_team', { p_id: player.id, team_name: teamName }),
+      supabase.rpc('get_bowler_over_stats_by_team', { p_id: player.id, team_name: teamName }),
     ])
 
     setBatData((batRes.data as any[] || []).map(r => ({
@@ -162,6 +160,19 @@ function PlayerOverAnalysis() {
     })))
 
     setLoading(false)
+  }
+
+  const handleSelect = async (player: any) => {
+    setSelectedPlayer(player)
+    setQuery(player.name)
+    setResults([])
+    setSelectedTeam(null)
+    await fetchData(player, null)
+  }
+
+  const handleTeamFilter = async (teamName: string | null) => {
+    setSelectedTeam(teamName)
+    await fetchData(selectedPlayer, teamName)
   }
 
   const hasBatData = batData.some(d => d.runs > 0)
@@ -220,6 +231,34 @@ function PlayerOverAnalysis() {
             <div>
               <h3 className="text-xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>{selectedPlayer.name}</h3>
               <span className="text-xs text-muted-foreground">{selectedPlayer.short_name}</span>
+            </div>
+          </div>
+
+          {/* Team filter */}
+          <div className="bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 p-3 mb-4">
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Filter by Team</div>
+            <div className="flex flex-wrap gap-2">
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                onClick={() => handleTeamFilter(null)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  selectedTeam === null ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-background/50 text-muted-foreground border border-border/30 hover:text-foreground'
+                }`}>
+                All Teams
+              </motion.button>
+              {IPL_FRANCHISES.map(team => (
+                <motion.button key={team.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                  onClick={() => handleTeamFilter(team.name)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    selectedTeam === team.name ? 'border' : 'bg-background/50 border border-border/30'
+                  }`}
+                  style={{
+                    color: selectedTeam === team.name ? team.color : undefined,
+                    borderColor: selectedTeam === team.name ? team.color : undefined,
+                    backgroundColor: selectedTeam === team.name ? `${team.color}15` : undefined,
+                  }}>
+                  {team.shortName}
+                </motion.button>
+              ))}
             </div>
           </div>
 

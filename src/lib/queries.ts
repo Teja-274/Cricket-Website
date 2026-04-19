@@ -464,11 +464,17 @@ export async function getPlayerDismissals(playerId: string) {
 
 export async function searchPlayersDB(query: string, limit = 10) {
   if (!supabase || !query.trim()) return []
-  const { data } = await supabase
-    .from('players')
-    .select('id, name, short_name')
-    .ilike('name', `%${query}%`)
-    .limit(limit)
+  const { data, error } = await supabase.rpc('search_players', { q: query, lim: limit })
+  if (error) {
+    console.error('[Queries] search_players error:', error)
+    // Fallback to basic search
+    const { data: fallback } = await supabase
+      .from('players')
+      .select('id, name, short_name')
+      .ilike('name', `%${query}%`)
+      .limit(limit)
+    return fallback || []
+  }
   return data || []
 }
 

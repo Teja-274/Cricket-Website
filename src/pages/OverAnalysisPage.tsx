@@ -304,10 +304,10 @@ function PlayerOverAnalysis() {
             <>
               <h3 className="text-sm font-bold uppercase text-muted-foreground" style={{ fontFamily: 'var(--font-heading)' }}>BATTING — OVER BY OVER</h3>
 
-              <div className="grid lg:grid-cols-2 gap-6">
+              <div className="grid lg:grid-cols-3 gap-6">
                 <Card className="bg-card/80 backdrop-blur-sm border-border/50">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-bold">AVG RUNS & STRIKE RATE</CardTitle>
+                    <CardTitle className="text-xs font-bold">AVG RUNS PER OVER</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ChartContainer config={batChartConfig} className="h-[250px]">
@@ -317,6 +317,23 @@ function PlayerOverAnalysis() {
                         <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Line type="monotone" dataKey="avgRuns" stroke="#c0c8d4" strokeWidth={2} dot={{ r: 3 }} />
+                      </LineChart>
+                    </ChartContainer>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xs font-bold">STRIKE RATE PER OVER</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ChartContainer config={batChartConfig} className="h-[250px]">
+                      <LineChart data={batData} margin={{ left: -10, right: 10 }}>
+                        <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.3} />
+                        <XAxis dataKey="over" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
+                        <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Line type="monotone" dataKey="sr" stroke="#22c55e" strokeWidth={2} dot={{ r: 3, fill: '#22c55e' }} />
                       </LineChart>
                     </ChartContainer>
                   </CardContent>

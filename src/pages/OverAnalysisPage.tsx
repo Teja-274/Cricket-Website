@@ -113,6 +113,7 @@ function PlayerOverAnalysis() {
   const [results, setResults] = useState<any[]>([])
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null)
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null)
+  const [filterMode, setFilterMode] = useState<'for' | 'vs'>('vs')
   const [batData, setBatData] = useState<any[]>([])
   const [bowlData, setBowlData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -127,13 +128,16 @@ function PlayerOverAnalysis() {
     setSearching(false)
   }
 
-  const fetchData = async (player: any, teamName: string | null) => {
+  const fetchData = async (player: any, teamName: string | null, mode: 'for' | 'vs' = filterMode) => {
     if (!supabase || !player) return
     setLoading(true)
 
+    const batFn = teamName === null ? 'get_batter_over_stats' : mode === 'vs' ? 'get_batter_over_stats_vs_team' : 'get_batter_over_stats_by_team'
+    const bowlFn = teamName === null ? 'get_bowler_over_stats' : mode === 'vs' ? 'get_bowler_over_stats_vs_team' : 'get_bowler_over_stats_by_team'
+
     const [batRes, bowlRes] = await Promise.all([
-      supabase.rpc('get_batter_over_stats_by_team', { p_id: player.id, team_name: teamName }),
-      supabase.rpc('get_bowler_over_stats_by_team', { p_id: player.id, team_name: teamName }),
+      supabase.rpc(batFn, teamName === null ? { p_id: player.id } : { p_id: player.id, team_name: teamName }),
+      supabase.rpc(bowlFn, teamName === null ? { p_id: player.id } : { p_id: player.id, team_name: teamName }),
     ])
 
     setBatData((batRes.data as any[] || []).map(r => ({
@@ -172,7 +176,14 @@ function PlayerOverAnalysis() {
 
   const handleTeamFilter = async (teamName: string | null) => {
     setSelectedTeam(teamName)
-    await fetchData(selectedPlayer, teamName)
+    await fetchData(selectedPlayer, teamName, filterMode)
+  }
+
+  const handleModeSwitch = async (mode: 'for' | 'vs') => {
+    setFilterMode(mode)
+    if (selectedTeam) {
+      await fetchData(selectedPlayer, selectedTeam, mode)
+    }
   }
 
   const hasBatData = batData.some(d => d.runs > 0)
@@ -235,8 +246,28 @@ function PlayerOverAnalysis() {
           </div>
 
           {/* Team filter */}
-          <div className="bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 p-3 mb-4">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Filter by Team</div>
+          <div className="bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 p-3 mb-4 space-y-3">
+            {/* For / Vs toggle */}
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Filter by Team</div>
+              {selectedTeam && (
+                <div className="flex items-center bg-background/50 rounded-lg border border-border/30 p-0.5">
+                  <button onClick={() => handleModeSwitch('for')}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                      filterMode === 'for' ? 'bg-chart-2/20 text-chart-2' : 'text-muted-foreground hover:text-foreground'
+                    }`}>
+                    Playing For
+                  </button>
+                  <button onClick={() => handleModeSwitch('vs')}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                      filterMode === 'vs' ? 'bg-destructive/20 text-destructive' : 'text-muted-foreground hover:text-foreground'
+                    }`}>
+                    Vs (Against)
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="flex flex-wrap gap-2">
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 onClick={() => handleTeamFilter(null)}
@@ -260,6 +291,12 @@ function PlayerOverAnalysis() {
                 </motion.button>
               ))}
             </div>
+
+            {selectedTeam && (
+              <div className="text-xs text-muted-foreground">
+                Showing stats {filterMode === 'vs' ? <span className="text-destructive font-medium">against</span> : <span className="text-chart-2 font-medium">playing for</span>} {selectedTeam}
+              </div>
+            )}
           </div>
 
           {/* Batting over-by-over */}

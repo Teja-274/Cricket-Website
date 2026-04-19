@@ -21,7 +21,7 @@ import { FranchisePage } from '@/pages/FranchisePage'
 import { OverAnalysisPage } from '@/pages/OverAnalysisPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { AuctionReplayPage } from '@/pages/AuctionReplayPage'
-import { SpiderCursor } from '@/components/ui/spider-cursor'
+import { CursorFollower } from '@/components/ui/cursor-follower'
 
 export default function App() {
   return (
@@ -54,7 +54,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
-      <SpiderCursor />
+      <CursorFollower />
       <Toaster richColors position="bottom-right" theme="dark" />
     </BrowserRouter>
   )

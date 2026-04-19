@@ -106,9 +106,9 @@ export function SpiderCursor() {
       // Clear with transparent background (overlay mode)
       ctx.clearRect(0, 0, w, h)
 
-      // Draw spider web lines in white with low opacity
-      ctx.fillStyle = "rgba(255, 255, 255, 0.8)"
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.3)"
+      // Draw spider web lines in dark grey
+      ctx.fillStyle = "rgba(100, 100, 100, 0.6)"
+      ctx.strokeStyle = "rgba(80, 80, 80, 0.25)"
       ctx.lineWidth = 0.5
 
       t /= 1000

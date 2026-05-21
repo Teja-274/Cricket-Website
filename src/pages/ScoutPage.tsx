@@ -39,17 +39,46 @@ export function ScoutPage() {
     setAiResults(null)
     try {
       const response = await askGrok(aiQuery, SEARCH_SYSTEM_PROMPT)
-      // Parse JSON array from response
-      const match = response.match(/\[[\s\S]*\]/)
-      if (match) {
-        const names = JSON.parse(match[0]) as string[]
-        setAiResults(names)
+      console.log('[AI Search] Raw response:', response)
+
+      let names: string[] = []
+
+      // Try parsing as JSON array first
+      const arrayMatch = response.match(/\[[\s\S]*?\]/)
+      if (arrayMatch) {
+        try {
+          const parsed = JSON.parse(arrayMatch[0])
+          if (Array.isArray(parsed)) {
+            names = parsed.filter(n => typeof n === 'string')
+          }
+        } catch { /* fall through */ }
+      }
+
+      // Fallback: extract player names from numbered/bulleted lists
+      if (names.length === 0) {
+        const lines = response.split('\n')
+        for (const line of lines) {
+          // Match patterns like "1. Player Name", "- Player Name", "* Player Name"
+          const match = line.match(/^[\d.\-*•)\s]+(.+?)(?:\s*[-—:].*)?$/)
+          if (match) {
+            const name = match[1].trim().replace(/[*"`]/g, '')
+            if (name && name.length > 2 && name.length < 50 && /^[A-Z]/.test(name)) {
+              names.push(name)
+            }
+          }
+        }
+      }
+
+      if (names.length > 0) {
+        setAiResults(names.slice(0, 8))
         toast.success(`AI found ${names.length} matching players`)
       } else {
-        toast.error('AI returned an unexpected response')
+        toast.error('No players found in AI response')
+        console.error('[AI Search] Could not extract names from:', response)
       }
     } catch (err) {
       toast.error('AI search failed')
+      console.error('[AI Search]', err)
     } finally {
       setAiLoading(false)
     }

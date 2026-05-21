@@ -1,17 +1,63 @@
-// Grok AI service - uses xAI API
+// AI service - uses Anthropic Claude API (with Grok fallback)
 
+const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY || ''
 const GROK_API_KEY = import.meta.env.VITE_GROK_API_KEY || ''
 
-export const isGrokConfigured = () => !!GROK_API_KEY
+export const isGrokConfigured = () => !!ANTHROPIC_API_KEY || !!GROK_API_KEY
 
 export async function askGrok(userPrompt: string, systemPrompt: string): Promise<string> {
+  // Prefer Anthropic Claude if configured
+  if (ANTHROPIC_API_KEY) {
+    return askClaude(userPrompt, systemPrompt)
+  }
   if (!GROK_API_KEY) {
-    console.warn('[Grok] No API key configured, using mock response')
+    console.warn('[AI] No API key configured, using mock response')
     return getMockResponse(userPrompt)
   }
+  return askGrokAPI(userPrompt, systemPrompt)
+}
 
+async function askClaude(userPrompt: string, systemPrompt: string): Promise<string> {
   try {
-    console.log('[Grok] Calling xAI API...')
+    console.log('[Claude] Calling Anthropic API...')
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 800,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+    })
+
+    if (!res.ok) {
+      const errorBody = await res.text()
+      console.error('[Claude] API error:', res.status, errorBody)
+      return `AI service error (${res.status}). Using mock response:\n\n${getMockResponse(userPrompt)}`
+    }
+
+    const data = await res.json()
+    const content = data.content?.[0]?.text
+    if (!content) {
+      console.error('[Claude] Empty response:', data)
+      return getMockResponse(userPrompt)
+    }
+    console.log('[Claude] Success')
+    return content
+  } catch (err) {
+    console.error('[Claude] Request failed:', err)
+    return `AI request failed (${err instanceof Error ? err.message : 'unknown error'}). Using mock response:\n\n${getMockResponse(userPrompt)}`
+  }
+}
+
+async function askGrokAPI(userPrompt: string, systemPrompt: string): Promise<string> {
+  try {
     const res = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -19,34 +65,23 @@ export async function askGrok(userPrompt: string, systemPrompt: string): Promise
         'Authorization': `Bearer ${GROK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'grok-2-latest',
+        model: 'grok-beta',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
         max_tokens: 800,
         temperature: 0.7,
-        stream: false,
       }),
     })
 
     if (!res.ok) {
-      const errorBody = await res.text()
-      console.error('[Grok] API error:', res.status, errorBody)
       return `AI service error (${res.status}). Using mock response:\n\n${getMockResponse(userPrompt)}`
     }
-
     const data = await res.json()
-    const content = data.choices?.[0]?.message?.content
-    if (!content) {
-      console.error('[Grok] Empty response:', data)
-      return getMockResponse(userPrompt)
-    }
-    console.log('[Grok] Success')
-    return content
-  } catch (err) {
-    console.error('[Grok] Request failed:', err)
-    return `AI request failed (${err instanceof Error ? err.message : 'unknown error'}). Using mock response:\n\n${getMockResponse(userPrompt)}`
+    return data.choices?.[0]?.message?.content || getMockResponse(userPrompt)
+  } catch {
+    return getMockResponse(userPrompt)
   }
 }
 

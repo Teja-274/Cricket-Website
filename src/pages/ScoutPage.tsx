@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { PlayerCard } from '@/components/scout/PlayerCard'
 import { PLAYERS, type PlayerRole, type PlayerTier } from '@/data/players'
 import { askGrok, SEARCH_SYSTEM_PROMPT, isGrokConfigured } from '@/lib/grok'
+import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 
 const roles: PlayerRole[] = ['Batsman', 'Bowler', 'All-Rounder', 'WK-Batsman']
@@ -31,51 +32,70 @@ export function ScoutPage() {
   const [sortBy, setSortBy] = useState('name')
   const [aiQuery, setAiQuery] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
-  const [aiResults, setAiResults] = useState<string[] | null>(null)
+  const [aiResults, setAiResults] = useState<{ id: string; name: string; reason: string }[] | null>(null)
 
   const handleAiSearch = async () => {
     if (!aiQuery.trim()) return
     setAiLoading(true)
     setAiResults(null)
     try {
+      // Step 1: Ask Claude to convert query into filters
       const response = await askGrok(aiQuery, SEARCH_SYSTEM_PROMPT)
       console.log('[AI Search] Raw response:', response)
 
-      let names: string[] = []
-
-      // Try parsing as JSON array first
-      const arrayMatch = response.match(/\[[\s\S]*?\]/)
-      if (arrayMatch) {
+      // Step 2: Parse JSON filters from response
+      let filters: any = {}
+      const jsonMatch = response.match(/\{[\s\S]*\}/)
+      if (jsonMatch) {
         try {
-          const parsed = JSON.parse(arrayMatch[0])
-          if (Array.isArray(parsed)) {
-            names = parsed.filter(n => typeof n === 'string')
-          }
-        } catch { /* fall through */ }
-      }
-
-      // Fallback: extract player names from numbered/bulleted lists
-      if (names.length === 0) {
-        const lines = response.split('\n')
-        for (const line of lines) {
-          // Match patterns like "1. Player Name", "- Player Name", "* Player Name"
-          const match = line.match(/^[\d.\-*•)\s]+(.+?)(?:\s*[-—:].*)?$/)
-          if (match) {
-            const name = match[1].trim().replace(/[*"`]/g, '')
-            if (name && name.length > 2 && name.length < 50 && /^[A-Z]/.test(name)) {
-              names.push(name)
-            }
-          }
+          filters = JSON.parse(jsonMatch[0])
+        } catch {
+          toast.error('Could not understand the query')
+          setAiLoading(false)
+          return
         }
       }
 
-      if (names.length > 0) {
-        setAiResults(names.slice(0, 8))
-        toast.success(`AI found ${names.length} matching players`)
-      } else {
-        toast.error('No players found in AI response')
-        console.error('[AI Search] Could not extract names from:', response)
+      console.log('[AI Search] Parsed filters:', filters)
+
+      // Step 3: Query Supabase with the filters
+      if (!supabase) {
+        toast.error('Database not connected')
+        setAiLoading(false)
+        return
       }
+
+      const { data, error } = await supabase.rpc('search_players_filtered', {
+        p_role: filters.role || null,
+        p_batting_style: filters.batting_style || null,
+        p_bowling_style: filters.bowling_style || null,
+        p_min_matches: filters.min_matches || 0,
+        p_name_contains: filters.name_contains || null,
+        p_intent: filters.intent || null,
+        lim: 10,
+      })
+
+      if (error) {
+        console.error('[AI Search] DB error:', error)
+        toast.error('Search query failed')
+        setAiLoading(false)
+        return
+      }
+
+      if (!data || data.length === 0) {
+        toast.error('No players match those criteria')
+        setAiLoading(false)
+        return
+      }
+
+      const results = (data as any[]).map(p => ({
+        id: p.id,
+        name: p.name,
+        reason: p.reason,
+      }))
+
+      setAiResults(results)
+      toast.success(`Found ${results.length} players`)
     } catch (err) {
       toast.error('AI search failed')
       console.error('[AI Search]', err)
@@ -153,17 +173,22 @@ export function ScoutPage() {
           <AnimatePresence>
             {aiResults && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                className="mt-3 flex flex-wrap gap-2">
-                <span className="text-xs text-muted-foreground">AI suggests:</span>
-                {aiResults.map((name, i) => (
-                  <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10"
-                    onClick={() => { setSearch(name); setAiResults(null) }}>
-                    {name}
-                  </Badge>
-                ))}
-                <button onClick={() => setAiResults(null)} className="text-xs text-muted-foreground hover:text-foreground ml-auto">
-                  <X className="w-3 h-3" />
-                </button>
+                className="mt-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">AI found {aiResults.length} players matching your criteria:</span>
+                  <button onClick={() => setAiResults(null)} className="text-xs text-muted-foreground hover:text-foreground">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {aiResults.map((player, i) => (
+                    <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10"
+                      onClick={() => { setSearch(player.name); setAiResults(null) }}
+                      title={player.reason}>
+                      {player.name}
+                    </Badge>
+                  ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

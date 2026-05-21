@@ -124,12 +124,23 @@ Give a definitive recommendation, not a wishy-washy "both are good" answer.
 Keep the response under 100 words.`
 
 // Search cricket players using natural language
-export const SEARCH_SYSTEM_PROMPT = `You are a cricket scout search engine.
-Given a natural language query, return player names that match the criteria.
-Return ONLY a JSON array of player names (use common Indian cricket player name format).
-Example query: "young left-arm spinner who bowls well in death overs"
-Example response: ["Axar Patel", "Kuldeep Yadav", "Yuzvendra Chahal"]
-Return maximum 6 players. Only return the JSON array, no other text.`
+export const SEARCH_SYSTEM_PROMPT = `You convert natural language cricket player searches into filter criteria.
+
+Given a query, return ONLY a JSON object with these optional fields:
+- "role": "Batsman" | "Bowler" | "All-Rounder" | "WK-Batsman"
+- "batting_style": "Right-Hand" | "Left-Hand"
+- "bowling_style": substring like "Fast", "Spin", "Off Spin", "Leg Spin", "Left-Arm", "Right-Arm"
+- "min_matches": minimum matches played (integer)
+- "name_contains": part of player name to match
+- "intent": "death_bowler" | "powerplay_batter" | "finisher" | "anchor" (optional)
+
+Examples:
+"young left-arm fast bowler" -> {"role":"Bowler","bowling_style":"Left-Arm Fast","min_matches":5}
+"hard hitting left hand batsman" -> {"role":"Batsman","batting_style":"Left-Hand","intent":"finisher"}
+"experienced spinner" -> {"role":"Bowler","bowling_style":"Spin","min_matches":50}
+"young indian wicket keeper" -> {"role":"WK-Batsman","min_matches":5}
+
+Return ONLY valid JSON, no other text or markdown.`
 
 // Squad analyzer for shortlists
 export const SQUAD_ANALYZER_SYSTEM_PROMPT = `You are an IPL squad balance analyst.

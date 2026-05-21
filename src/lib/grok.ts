@@ -29,7 +29,7 @@ async function askClaude(userPrompt: string, systemPrompt: string): Promise<stri
         'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-haiku-4-5',
         max_tokens: 800,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],

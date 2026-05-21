@@ -6,10 +6,12 @@ export const isGrokConfigured = () => !!GROK_API_KEY
 
 export async function askGrok(userPrompt: string, systemPrompt: string): Promise<string> {
   if (!GROK_API_KEY) {
+    console.warn('[Grok] No API key configured, using mock response')
     return getMockResponse(userPrompt)
   }
 
   try {
+    console.log('[Grok] Calling xAI API...')
     const res = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -17,26 +19,34 @@ export async function askGrok(userPrompt: string, systemPrompt: string): Promise
         'Authorization': `Bearer ${GROK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'grok-3-mini-fast',
+        model: 'grok-2-latest',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
         max_tokens: 800,
         temperature: 0.7,
+        stream: false,
       }),
     })
 
     if (!res.ok) {
-      console.error('[Grok] API error:', res.status)
-      return getMockResponse(userPrompt)
+      const errorBody = await res.text()
+      console.error('[Grok] API error:', res.status, errorBody)
+      return `AI service error (${res.status}). Using mock response:\n\n${getMockResponse(userPrompt)}`
     }
 
     const data = await res.json()
-    return data.choices?.[0]?.message?.content || getMockResponse(userPrompt)
+    const content = data.choices?.[0]?.message?.content
+    if (!content) {
+      console.error('[Grok] Empty response:', data)
+      return getMockResponse(userPrompt)
+    }
+    console.log('[Grok] Success')
+    return content
   } catch (err) {
     console.error('[Grok] Request failed:', err)
-    return getMockResponse(userPrompt)
+    return `AI request failed (${err instanceof Error ? err.message : 'unknown error'}). Using mock response:\n\n${getMockResponse(userPrompt)}`
   }
 }
 

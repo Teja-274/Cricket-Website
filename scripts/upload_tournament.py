@@ -22,8 +22,33 @@ import urllib.request
 import urllib.error
 from urllib.parse import quote
 
+# Force UTF-8 stdout for Windows consoles (cp1252 can't print → ✓ etc.)
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 SUPABASE_URL = 'https://ejremkmgobdrjoapwwqq.supabase.co'
-SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqcmVta21nb2JkcmpvYXB3d3FxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxODk1MzksImV4cCI6MjA5MDc2NTUzOX0.5uHkKhLn0TTucD1pEuxN-9ibfQh_-w5p6D2BgKap6O8'
+
+# Load service-role key from .env (bypasses RLS for ETL).
+# Falls back to legacy anon key (which will hit RLS) if not set.
+def _load_env_key():
+    env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+    if not os.path.exists(env_path):
+        return None
+    with open(env_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('SUPABASE_SERVICE_ROLE_KEY='):
+                return line.split('=', 1)[1].strip()
+    return None
+
+SERVICE_KEY = _load_env_key() or 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqcmVta21nb2JkcmpvYXB3d3FxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxODk1MzksImV4cCI6MjA5MDc2NTUzOX0.5uHkKhLn0TTucD1pEuxN-9ibfQh_-w5p6D2BgKap6O8'
+
+if SERVICE_KEY.startswith('sb_secret_'):
+    print('[upload] Using service_role key (RLS bypassed)')
+else:
+    print('[upload] WARNING: Using anon key — RLS may silently block inserts')
 
 DATA_ROOT = os.path.join(os.path.dirname(__file__), '..', 'supabase', 'data')
 
@@ -34,20 +59,36 @@ BASE_HEADERS = {
 }
 
 
-def http(method, path, body=None, extra_headers=None, timeout=60):
-    """Generic HTTP helper. Returns (status, text)."""
+def http(method, path, body=None, extra_headers=None, timeout=60, retries=5):
+    """Generic HTTP helper with transient-error retry. Returns (status, text)."""
     headers = dict(BASE_HEADERS)
     if extra_headers:
         headers.update(extra_headers)
     data = json.dumps(body).encode('utf-8') if body is not None else None
-    req = urllib.request.Request(
-        f'{SUPABASE_URL}{path}', data=data, headers=headers, method=method
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.status, resp.read().decode('utf-8')
-    except urllib.error.HTTPError as e:
-        return e.code, e.read().decode('utf-8')[:500] if e.fp else ''
+
+    last_err = None
+    for attempt in range(retries):
+        req = urllib.request.Request(
+            f'{SUPABASE_URL}{path}', data=data, headers=headers, method=method
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return resp.status, resp.read().decode('utf-8')
+        except urllib.error.HTTPError as e:
+            # HTTP errors (4xx/5xx) are returned to caller — no retry except 5xx
+            body_text = e.read().decode('utf-8')[:500] if e.fp else ''
+            if e.code >= 500 and attempt < retries - 1:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            return e.code, body_text
+        except Exception as e:
+            # Network/SSL/timeout — retry with backoff
+            last_err = e
+            if attempt < retries - 1:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            return 599, f'NETWORK: {type(e).__name__}: {str(e)[:200]}'
+    return 599, f'NETWORK_MAX_RETRIES: {last_err}'
 
 
 def get_all(table, select='*'):
@@ -78,17 +119,11 @@ def post(table, rows, on_conflict=None, prefer='return=minimal'):
         path += f'?on_conflict={on_conflict}'
         prefer = f'{prefer},resolution=merge-duplicates'
     extra = {'Prefer': prefer}
-    for attempt in range(3):
-        status, text = http('POST', path, body=rows, extra_headers=extra, timeout=120)
-        if status < 300:
-            return True, ''
-        if status == 409:
-            return True, 'duplicate-ignored'
-        if attempt < 2:
-            time.sleep(2)
-            continue
-        return False, f'HTTP {status}: {text[:300]}'
-    return False, 'max retries'
+    status, text = http('POST', path, body=rows, extra_headers=extra, timeout=120)
+    if status < 300:
+        return True, ''
+    # 409 = real conflict (e.g. SERIAL out of sync), NOT something to silently swallow
+    return False, f'HTTP {status}: {text[:300]}'
 
 
 def batched(iterable, n):

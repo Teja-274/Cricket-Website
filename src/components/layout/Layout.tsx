@@ -10,6 +10,7 @@ import { LimelightNav } from '@/components/ui/limelight-nav'
 import type { NavItem } from '@/components/ui/limelight-nav'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { SoundToggle } from '@/components/ui/sound-toggle'
+import { TournamentFilter } from '@/components/layout/TournamentFilter'
 
 const pageVariants = {
   initial: { opacity: 0, y: 12, filter: 'blur(4px)' },
@@ -80,6 +81,7 @@ export function Layout() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          <TournamentFilter variant="dropdown" />
           <ThemeToggle />
           <SoundToggle />
         </div>

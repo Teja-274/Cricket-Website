@@ -31,9 +31,12 @@ export async function getTopRunScorers(limit = 20) {
 }
 
 // Uses RPC functions for accurate aggregation (no row limit issues)
-export async function getTopBatsmen(limit = 20) {
+// `tournaments` defaults to IPL — pass an array to filter by other tournaments
+export async function getTopBatsmen(limit = 20, tournaments?: string[]) {
   if (!supabase) return []
-  const { data, error } = await supabase.rpc('get_top_batsmen', { lim: limit })
+  const params: any = { lim: limit }
+  if (tournaments && tournaments.length > 0) params.p_tournaments = tournaments
+  const { data, error } = await supabase.rpc('get_top_batsmen', params)
   if (error || !data) {
     console.error('[Queries] get_top_batsmen error:', error)
     return []
@@ -54,9 +57,11 @@ export async function getTopBatsmen(limit = 20) {
   }))
 }
 
-export async function getTopBowlers(limit = 20) {
+export async function getTopBowlers(limit = 20, tournaments?: string[]) {
   if (!supabase) return []
-  const { data, error } = await supabase.rpc('get_top_bowlers', { lim: limit })
+  const params: any = { lim: limit }
+  if (tournaments && tournaments.length > 0) params.p_tournaments = tournaments
+  const { data, error } = await supabase.rpc('get_top_bowlers', params)
   if (error || !data) {
     console.error('[Queries] get_top_bowlers error:', error)
     return []
@@ -296,16 +301,23 @@ export async function getAllSeasons() {
   return data || []
 }
 
-export async function getSeasonLeaderboard(seasonYear: number) {
+export async function getSeasonLeaderboard(seasonYear: number, tournaments: string[] = ['IPL']) {
   if (!supabase) return { batsmen: [], bowlers: [], matches: 0 }
 
   const { data: season } = await supabase.from('seasons').select('id').eq('year', seasonYear).single()
   if (!season) return { batsmen: [], bowlers: [], matches: 0 }
 
-  const { data: matchCount } = await supabase.from('matches').select('id', { count: 'exact' }).eq('season_id', season.id)
+  const { data: matchCount } = await supabase
+    .from('matches')
+    .select('id', { count: 'exact' })
+    .eq('season_id', season.id)
+    .in('tournament', tournaments)
 
   // Use RPC function for pre-aggregated data (no row limit issues)
-  const { data: stats, error } = await supabase.rpc('get_season_leaderboard', { season_yr: seasonYear })
+  const { data: stats, error } = await supabase.rpc('get_season_leaderboard', {
+    season_yr: seasonYear,
+    p_tournaments: tournaments,
+  })
 
   if (error || !stats) {
     console.error('[Queries] Season leaderboard RPC error:', error)
@@ -364,9 +376,12 @@ export async function getPlayerById(playerId: string) {
   return data
 }
 
-export async function getPlayerCareerStats(playerId: string) {
+export async function getPlayerCareerStats(playerId: string, tournaments: string[] = ['IPL']) {
   if (!supabase) return null
-  const { data, error } = await supabase.rpc('get_player_career_stats', { p_id: playerId })
+  const { data, error } = await supabase.rpc('get_player_career_stats', {
+    p_id: playerId,
+    p_tournaments: tournaments,
+  })
   if (error || !data || (data as any[]).length === 0) return null
   const r = (data as any[])[0]
   return {
@@ -425,9 +440,12 @@ export async function getPlayerVenuePerformance(playerId: string) {
 // SEASON CHAMPION
 // ============================================================
 
-export async function getSeasonChampion(seasonYear: number) {
+export async function getSeasonChampion(seasonYear: number, tournaments: string[] = ['IPL']) {
   if (!supabase) return null
-  const { data, error } = await supabase.rpc('get_season_champion', { season_yr: seasonYear })
+  const { data, error } = await supabase.rpc('get_season_champion', {
+    season_yr: seasonYear,
+    p_tournaments: tournaments,
+  })
   if (error || !data || (data as any[]).length === 0) return null
   const r = (data as any[])[0]
   return {
@@ -482,15 +500,17 @@ export async function searchPlayersDB(query: string, limit = 10) {
 // OVERVIEW STATS
 // ============================================================
 
-export async function getOverviewStats() {
+export async function getOverviewStats(tournaments: string[] = ['IPL']) {
   if (!supabase) return null
 
-  const [matches, deliveries, wickets, sixes] = await Promise.all([
-    supabase.from('matches').select('id', { count: 'exact', head: true }),
-    supabase.from('deliveries').select('id', { count: 'exact', head: true }),
-    supabase.from('wickets').select('id', { count: 'exact', head: true }),
-    supabase.from('deliveries').select('id', { count: 'exact', head: true }).eq('batter_runs', 6),
-  ])
+  // All counts must be tournament-filtered now that the DB holds 6 tournaments
+  // (1.5M+ deliveries) — a global count(*) times out the REST endpoint.
+  const matchesQ = supabase.from('matches').select('id', { count: 'exact', head: true }).in('tournament', tournaments)
+  const deliveriesQ = supabase.from('deliveries').select('id', { count: 'exact', head: true }).in('tournament', tournaments)
+  const wicketsQ = supabase.from('wickets').select('id', { count: 'exact', head: true }).in('tournament', tournaments)
+  const sixesQ = supabase.from('deliveries').select('id', { count: 'exact', head: true }).in('tournament', tournaments).eq('batter_runs', 6)
+
+  const [matches, deliveries, wickets, sixes] = await Promise.all([matchesQ, deliveriesQ, wicketsQ, sixesQ])
 
   return {
     totalMatches: matches.count || 0,

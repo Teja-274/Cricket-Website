@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Target, Loader2, Filter } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
+import { useTournamentStore } from '@/store/tournamentStore'
 
 const BOWL_STYLES = ['All', 'Right-Arm Fast', 'Left-Arm Fast', 'Off Spin', 'Leg Spin', 'Left-Arm Spin']
 const BAT_STYLES = ['All', 'Right-Hand', 'Left-Hand']
@@ -14,6 +15,7 @@ const PHASES = [
 ]
 
 export function MatchupExplorerPage() {
+  const selectedTournaments = useTournamentStore(s => s.selected)
   const [bowlStyle, setBowlStyle] = useState('All')
   const [batStyle, setBatStyle] = useState('All')
   const [phase, setPhase] = useState('all')
@@ -28,6 +30,7 @@ export function MatchupExplorerPage() {
         bowl_style: bowlStyle === 'All' ? null : bowlStyle,
         bat_style: batStyle === 'All' ? null : batStyle,
         phase_filter: phase === 'all' ? null : phase,
+        p_tournaments: selectedTournaments,
         lim: 50,
       })
       if (error) console.error(error)
@@ -35,7 +38,7 @@ export function MatchupExplorerPage() {
       setLoading(false)
     }
     fetch()
-  }, [bowlStyle, batStyle, phase])
+  }, [bowlStyle, batStyle, phase, selectedTournaments])
 
   return (
     <div className="min-h-screen p-6 lg:p-8">

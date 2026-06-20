@@ -9,6 +9,7 @@ import { PLAYERS, type PlayerRole, type PlayerTier } from '@/data/players'
 import { askGrok, SEARCH_SYSTEM_PROMPT, isGrokConfigured } from '@/lib/grok'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
+import { useTournamentStore } from '@/store/tournamentStore'
 
 const roles: PlayerRole[] = ['Batsman', 'Bowler', 'All-Rounder', 'WK-Batsman']
 const tiers: PlayerTier[] = ['International Ready', 'IPL Proven', 'Domestic Star', 'Emerging Talent']
@@ -22,6 +23,7 @@ const sortOptions = [
 ]
 
 export function ScoutPage() {
+  const selectedTournaments = useTournamentStore(s => s.selected)
   const [search, setSearch] = useState('')
   const [selectedRoles, setSelectedRoles] = useState<Set<string>>(new Set())
   const [selectedTiers, setSelectedTiers] = useState<Set<string>>(new Set())
@@ -72,6 +74,7 @@ export function ScoutPage() {
         p_min_matches: filters.min_matches || 0,
         p_name_contains: filters.name_contains || null,
         p_intent: filters.intent || null,
+        p_tournaments: selectedTournaments,
         lim: 10,
       })
 
@@ -158,7 +161,7 @@ export function ScoutPage() {
         <div className="relative mb-6 bg-gradient-to-r from-primary/10 via-card/80 to-chart-3/10 rounded-xl border border-primary/20 p-3">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold uppercase tracking-wider text-primary">AI SEARCH (Powered by Grok)</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-primary">AI SEARCH (Powered by Claude)</span>
             {!isGrokConfigured() && <Badge variant="outline" className="text-[10px]">Mock Mode</Badge>}
           </div>
           <div className="flex gap-2">

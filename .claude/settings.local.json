@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python3 -c \":*)",
       "Bash(npm run:*)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(npx tsc *)"
     ]
   }
 }

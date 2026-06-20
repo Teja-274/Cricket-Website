@@ -10,9 +10,11 @@ import {
 } from '@/components/ui/line-chart'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { getTopBatsmen, getTopBowlers, getOverviewStats } from '@/lib/queries'
+import { useTournamentStore } from '@/store/tournamentStore'
 
 export function AnalyticsPage() {
   const navigate = useNavigate()
+  const selectedTournaments = useTournamentStore(s => s.selected)
   const [batsmen, setBatsmen] = useState<any[]>([])
   const [bowlers, setBowlers] = useState<any[]>([])
   const [overview, setOverview] = useState<any>(null)
@@ -22,9 +24,9 @@ export function AnalyticsPage() {
     const fetch = async () => {
       setLoading(true)
       const [b, w, o] = await Promise.all([
-        getTopBatsmen(15),
-        getTopBowlers(15),
-        getOverviewStats(),
+        getTopBatsmen(15, selectedTournaments),
+        getTopBowlers(15, selectedTournaments),
+        getOverviewStats(selectedTournaments),
       ])
       setBatsmen(b)
       setBowlers(w)
@@ -32,7 +34,7 @@ export function AnalyticsPage() {
       setLoading(false)
     }
     fetch()
-  }, [])
+  }, [selectedTournaments])
 
   const batConfig: ChartConfig = { runs: { label: 'Runs', color: '#c0c8d4' } }
   const bowlConfig: ChartConfig = { wickets: { label: 'Wickets', color: '#22c55e' } }

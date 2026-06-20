@@ -11,9 +11,11 @@ import { Line, LineChart, CartesianGrid, XAxis, YAxis, Bar, BarChart } from 'rec
 import { IPL_FRANCHISES } from '@/data/franchises'
 import { supabase } from '@/lib/supabase'
 import { searchPlayersDB } from '@/lib/queries'
+import { useTournamentStore } from '@/store/tournamentStore'
 
 // ===== TEAM TAB =====
 function TeamOverAnalysis() {
+  const selectedTournaments = useTournamentStore(s => s.selected)
   const [selected, setSelected] = useState(IPL_FRANCHISES[0])
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -22,7 +24,10 @@ function TeamOverAnalysis() {
     const fetch = async () => {
       if (!supabase) return
       setLoading(true)
-      const { data: rows, error } = await supabase.rpc('get_team_over_stats', { team_name: selected.name })
+      const { data: rows, error } = await supabase.rpc('get_team_over_stats', {
+        team_name: selected.name,
+        p_tournaments: selectedTournaments,
+      })
       if (error) console.error(error)
       setData((rows as any[] || []).map(r => ({
         over: Number(r.over_num) + 1,
@@ -33,7 +38,7 @@ function TeamOverAnalysis() {
       setLoading(false)
     }
     fetch()
-  }, [selected])
+  }, [selected, selectedTournaments])
 
   const chartConfig: ChartConfig = {
     runsPerMatch: { label: 'Avg Runs', color: '#c0c8d4' },

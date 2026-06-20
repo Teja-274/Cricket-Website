@@ -7,10 +7,16 @@ import { NumberTicker } from '@/components/magicui/number-ticker'
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { SparklesText } from '@/components/magicui/sparkles-text'
 import { getAllSeasons, getSeasonLeaderboard, getSeasonChampion } from '@/lib/queries'
+import { useTournamentStore } from '@/store/tournamentStore'
 
 export function SeasonPage() {
   const { year } = useParams()
   const navigate = useNavigate()
+  const selectedTournaments = useTournamentStore(s => s.selected)
+  const tournaments = useTournamentStore(s => s.tournaments)
+  const primaryTournament = tournaments.find(t => t.code === selectedTournaments[0])
+  const tournamentLabel = primaryTournament?.short_name || selectedTournaments[0] || 'IPL'
+
   const [seasons, setSeasons] = useState<any[]>([])
   const [selectedYear, setSelectedYear] = useState<number>(year ? parseInt(year) : 2024)
   const [data, setData] = useState<any>(null)
@@ -26,14 +32,14 @@ export function SeasonPage() {
     setLoading(true)
     setChampion(null)
     Promise.all([
-      getSeasonLeaderboard(selectedYear),
-      getSeasonChampion(selectedYear),
+      getSeasonLeaderboard(selectedYear, selectedTournaments),
+      getSeasonChampion(selectedYear, selectedTournaments),
     ]).then(([d, c]) => {
       setData(d)
       setChampion(c)
       setLoading(false)
     })
-  }, [selectedYear])
+  }, [selectedYear, selectedTournaments])
 
   const orangeCap = data?.batsmen?.[0]
   const purpleCap = data?.bowlers?.[0]
@@ -44,7 +50,7 @@ export function SeasonPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
-              <Calendar className="inline-block w-8 h-8 text-primary mr-3 -mt-1" />IPL {selectedYear}
+              <Calendar className="inline-block w-8 h-8 text-primary mr-3 -mt-1" />{tournamentLabel} {selectedYear}
             </h1>
             <p className="text-muted-foreground mt-1">Season leaderboard and stats.</p>
           </div>
@@ -66,7 +72,7 @@ export function SeasonPage() {
                 className="relative bg-gradient-to-r from-yellow-500/15 via-card/80 to-yellow-500/15 backdrop-blur-sm rounded-2xl border border-yellow-500/30 p-6 mb-8 overflow-hidden text-center">
                 <BorderBeam size={300} duration={6} colorFrom="#eab308" colorTo="#c0c8d4" />
                 <Trophy className="w-10 h-10 text-yellow-400 mx-auto mb-2" />
-                <div className="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-2">IPL {selectedYear} CHAMPIONS</div>
+                <div className="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-2">{tournamentLabel} {selectedYear} CHAMPIONS</div>
                 <SparklesText className="text-4xl font-bold" sparklesCount={6} colors={{ first: '#eab308', second: '#c0c8d4' }}>
                   {champion.champion}
                 </SparklesText>
@@ -126,7 +132,7 @@ export function SeasonPage() {
             <div className="grid lg:grid-cols-2 gap-6">
               <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 overflow-hidden">
                 <div className="p-4 border-b border-border/30">
-                  <h3 className="text-sm font-bold uppercase" style={{ fontFamily: 'var(--font-heading)' }}>🧡 BATTING — IPL {selectedYear}</h3>
+                  <h3 className="text-sm font-bold uppercase" style={{ fontFamily: 'var(--font-heading)' }}>🧡 BATTING — {tournamentLabel} {selectedYear}</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -155,7 +161,7 @@ export function SeasonPage() {
 
               <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 overflow-hidden">
                 <div className="p-4 border-b border-border/30">
-                  <h3 className="text-sm font-bold uppercase" style={{ fontFamily: 'var(--font-heading)' }}>💜 BOWLING — IPL {selectedYear}</h3>
+                  <h3 className="text-sm font-bold uppercase" style={{ fontFamily: 'var(--font-heading)' }}>💜 BOWLING — {tournamentLabel} {selectedYear}</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

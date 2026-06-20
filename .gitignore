@@ -44,3 +44,9 @@ supabase/data/bbl/
 supabase/data/psl/
 supabase/data/cpl/
 supabase/data/t20i/
+
+# Test artifacts
+test-results/
+playwright-report/
+coverage/
+.vitest/

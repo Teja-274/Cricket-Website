@@ -60,26 +60,56 @@ export function ScoutPage() {
 
       console.log('[AI Search] Parsed filters:', filters)
 
-      // Step 3: Query Supabase with the filters
+      // Step 3: Query Supabase with the filters (with progressive fallback)
       if (!supabase) {
         toast.error('Database not connected')
         setAiLoading(false)
         return
       }
 
-      const { data, error } = await supabase.rpc('search_players_filtered', {
-        p_role: filters.role || null,
-        p_batting_style: filters.batting_style || null,
-        p_bowling_style: filters.bowling_style || null,
-        p_min_matches: filters.min_matches || 0,
-        p_name_contains: filters.name_contains || null,
-        p_intent: filters.intent || null,
-        p_tournaments: selectedTournaments,
-        lim: 10,
-      })
+      const runSearch = async (f: any) => {
+        return await supabase!.rpc('search_players_filtered', {
+          p_role: f.role || null,
+          p_batting_style: f.batting_style || null,
+          p_bowling_style: f.bowling_style || null,
+          p_min_matches: f.min_matches || 0,
+          p_name_contains: f.name_contains || null,
+          p_intent: f.intent || null,
+          p_tournaments: selectedTournaments,
+          lim: 10,
+        })
+      }
 
-      if (error) {
-        console.error('[AI Search] DB error:', error)
+      // Try the exact filter set first, then progressively loosen if empty.
+      // Order: drop bowling_style → drop batting_style → drop min_matches → drop role
+      const fallbackChain: { f: any; label: string }[] = [
+        { f: filters, label: 'exact' },
+        ...(filters.bowling_style ? [{ f: { ...filters, bowling_style: null }, label: 'broader' }] : []),
+        ...(filters.batting_style ? [{ f: { ...filters, batting_style: null, bowling_style: null }, label: 'broader' }] : []),
+        ...((filters.min_matches || 0) > 5
+          ? [{ f: { ...filters, min_matches: 5, batting_style: null, bowling_style: null }, label: 'broader' }]
+          : []),
+        ...(filters.role ? [{ f: { name_contains: filters.name_contains, role: filters.role, min_matches: 0 }, label: 'role-only' }] : []),
+      ]
+
+      let data: any[] | null = null
+      let labelUsed = ''
+      let lastError: any = null
+      for (const step of fallbackChain) {
+        const { data: stepData, error: stepError } = await runSearch(step.f)
+        if (stepError) {
+          lastError = stepError
+          continue
+        }
+        if (stepData && stepData.length > 0) {
+          data = stepData as any[]
+          labelUsed = step.label
+          break
+        }
+      }
+
+      if (lastError && !data) {
+        console.error('[AI Search] DB error:', lastError)
         toast.error('Search query failed')
         setAiLoading(false)
         return
@@ -98,7 +128,11 @@ export function ScoutPage() {
       }))
 
       setAiResults(results)
-      toast.success(`Found ${results.length} players`)
+      if (labelUsed === 'exact') {
+        toast.success(`Found ${results.length} players`)
+      } else {
+        toast.success(`Found ${results.length} similar players (broadened search)`)
+      }
     } catch (err) {
       toast.error('AI search failed')
       console.error('[AI Search]', err)

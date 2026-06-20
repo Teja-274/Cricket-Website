@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { Player } from '@/data/players'
 import type { Franchise } from '@/data/franchises'
 
@@ -61,7 +62,9 @@ function getBidIncrement(currentBid: number): number {
   return 1.0
 }
 
-export const useAuctionStore = create<AuctionState>((set, get) => ({
+export const useAuctionStore = create<AuctionState>()(
+  persist(
+    (set, get) => ({
   room: null,
   players: [],
   franchises: [],
@@ -253,4 +256,21 @@ export const useAuctionStore = create<AuctionState>((set, get) => ({
       isTimerRunning: true,
     })
   },
-}))
+    }),
+    {
+      name: 'scout-india-auction',
+      // Persist the auction state, but reset the running timer flag on reload
+      // (the user shouldn't get hit with a phantom ticking timer)
+      partialize: (state) => ({
+        room: state.room,
+        players: state.players,
+        franchises: state.franchises,
+        bids: state.bids,
+        currentBid: state.currentBid,
+        currentBidderId: state.currentBidderId,
+        timerSeconds: state.timerSeconds,
+        myFranchiseId: state.myFranchiseId,
+      }),
+    }
+  )
+)

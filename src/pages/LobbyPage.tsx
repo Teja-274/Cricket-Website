@@ -33,7 +33,17 @@ export function LobbyPage() {
 
   const handleStartAuction = () => {
     if (!selectedTeam) return
-    const room = { id: `room-${Date.now()}`, name: roomName, status: 'lobby' as const, format, currentPlayerIdx: 0, bidTimerSeconds: timer, totalPurseCr: purse, maxPlayers: 25 }
+    // Start directly in 'active' state — no need for a second "Start Auction" click
+    const room = {
+      id: `room-${Date.now()}`,
+      name: roomName,
+      status: 'active' as const,
+      format,
+      currentPlayerIdx: 0,
+      bidTimerSeconds: timer,
+      totalPurseCr: purse,
+      maxPlayers: 25,
+    }
     setRoom(room)
     setPlayers([...PLAYERS].sort(() => Math.random() - 0.5))
     setFranchises(IPL_FRANCHISES.map(f => createFranchise(f, purse)))

@@ -37,8 +37,17 @@ export function AuctionRoomPage() {
   const pendingCount = players.filter(p => p.status === 'pending').length
 
   useEffect(() => {
-    if (!room) navigate('/lobby')
-  }, [room, navigate])
+    if (!room) {
+      // No auction setup yet — bounce to the lobby
+      navigate('/lobby', { replace: true })
+      return
+    }
+    // If an active room has no current player (e.g. fresh open after refresh)
+    // and no timer is running, kick the timer on so the user sees bidding UI
+    if (room.status === 'active' && currentPlayer && !isTimerRunning) {
+      startTimer()
+    }
+  }, [room, navigate, currentPlayer, isTimerRunning, startTimer])
 
   // Keyboard shortcuts
   useEffect(() => {
